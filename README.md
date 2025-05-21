@@ -1,249 +1,275 @@
-# lighting-tools-website
-
+README: Luminaire GWP Calculator and Comparison Tool
 1. Project Overview
-The goal is to create a web-based "Luminaire GWP Calculator and Comparison Tool." This tool will allow users to input technical data for up to three different luminaires, along with project-specific parameters. Based on these inputs, the tool will calculate and visually compare their Global Warming Potential (GWP) under various operational scenarios. The design should closely follow the provided PDF mock-up.
+The "Luminaire GWP Calculator and Comparison Tool" is a single-page web application designed to help users assess and compare the Global Warming Potential (GWP) of different lighting setups. Users can input project-specific parameters and detailed data for up to three types of luminaires. The tool then calculates the GWP across various lifecycle stages (Manufacturing - Stage A, Operational Use - Stage B, End-of-Life - Stage EOL) and visualizes these results in stacked bar charts, allowing for easy comparison under different operational scenarios (L70 vs. L90 lifetimes, impact of control systems, and maintenance dimming).
+
+The application is built as a single HTML file, utilizing Tailwind CSS for styling and Chart.js for dynamic data visualization. The user interface aims for a clean, minimalist design with "Noto Sans" as the primary font.
 
 2. Key Features
-Data Input: Allow input for project-wide parameters and specific data for up to three types of luminaires.
+Data Input: Allows for comprehensive data entry for overall project parameters and specific details for up to three distinct luminaires.
 
-GWP Calculation: Implement logic to calculate the total GWP for each luminaire, considering manufacturing (Stage A), operational energy use (Stage B), and end-of-life (EOL).
+GWP Calculation: Implements detailed GWP calculations considering:
 
-Scenario Analysis: Calculate GWP based on L70 and L90 lifetimes.
+Manufacturing (Stage A) based on per-unit GWP and quantity, including replacements.
 
-Impact of Controls: Calculate GWP savings from using control systems.
+Operational Use (Stage B) based on wattage, operational hours, project life, CO2e grid factor, and adjusted by maintenance factors (L70 & L90).
 
-Impact of Maintenance Dimming: (Optional, if logic is clearly defined) Calculate GWP savings from a maintenance dimming strategy.
+End-of-Life (Stage EOL) based on per-unit GWP and quantity, including replacements.
 
-Graphical Results: Display GWP comparisons in bar charts for easy understanding.
+Scenario Analysis:
 
-Responsive Design: The website should be usable on different screen sizes.
+Compares GWP based on L70 and L90 luminaire lifetimes.
 
-3. Design and Layout (Based on PDF Mock-up)
-The website will have a clear, two-tab interface:
+Analyzes GWP reduction with control systems (using L90 lifetime as a baseline).
+
+Analyzes GWP reduction with control systems combined with maintenance dimming (using L90 lifetime as a baseline).
+
+Graphical Results: Displays GWP comparisons in three interactive stacked bar charts, showing the proportional impact of Stage A, B, and EOL for each scenario.
+
+Responsive Design: The application is designed to be responsive and usable across various screen sizes.
+
+Simplified UI: Features a minimalist design with clear typography and simple line-based UI elements.
+
+3. Design and Layout
+The application is structured as a single page with two main tabs:
+
+Header:
 
 Main Title: "LUMINAIRE GWP CALCULATOR AND COMPARISON TOOL"
 
-Tabs:
+Developer Credit: "Developed by Dimitrios Tsiokaras - dimitrios@electrolight.com"
 
-DATA Tab (Default View): This tab will be for all data inputs.
+Main Content Area:
 
-Left-aligned Input Section:
+Tabs Navigation:
 
-Project Parameters (Global):
+"DATA" Tab: Active by default, for all user inputs.
 
-CO2e Grid Factor (kg/kWh)
+"RESULTS" Tab: For displaying calculated GWP charts.
 
-Control System Coefficient (%)
+Active tab is indicated by a black bottom border and black text; inactive tabs have gray text.
 
-Operational Hours/Year
+"DATA" Tab Content:
 
-Anticipated Project Life (years)
+Introductory paragraph explaining the purpose of the section.
 
-Luminaire Data Sections (for Luminaire 1, Luminaire 2, Luminaire 3):
+Project Parameters Section: A bordered section for global inputs like CO2e grid factor, control savings, operational hours, project life, maintenance dimming savings, and L70/L90 maintenance factors.
 
-Each luminaire section should be clearly delineated.
+Luminaires Input Section: A grid layout dynamically populated with input sections for up to three luminaires. Each luminaire section is bordered and includes fields for its specific data.
 
-RESULTS Tab: This tab will display the calculated GWP comparisons in graphical form.
+"Calculate & View Results" Button: A prominent black button to trigger calculations and switch to the results view.
 
-Right-aligned Results Section:
+"RESULTS" Tab Content:
 
-Display multiple bar charts as specified in the "Outputs/Results Display" section below.
+Introductory paragraph explaining the charts.
+
+Charts Display: A two-column grid (on larger screens) displaying three chart containers. Each chart container has a border and a title.
+
+Chart 1: GWP L90 vs L70 Comparison
+
+Chart 2: GWP Comparison With Control (L90 Baseline)
+
+Chart 3: GWP With Control & Maintenance Dimming (L90 Baseline)
+
+"Back to Data" Button: A gray button to navigate back to the data input tab.
+
+Footer:
+
+A simple text indicating "Luminaire GWP Calculator v1.0".
 
 4. Input Fields
-4.1. Project Parameters (Under "DATA" Tab)
-These fields apply to the entire project/comparison.
+All input fields use a simple border style and are clearly labeled in black text.
 
-CO2e Grid Factor (kg/kWh): (Numeric input, e.g., 0.45)
+4.1. Project Parameters (Located in the "DATA" Tab)
+CO2e Grid Factor (kg/kWh): Default: 0.233
 
-Control System Coefficient (%): (Numeric input, e.g., 30 for 30% savings. This will be used to reduce operational energy.)
+Control System Savings (%): Default: 30
 
-Operational Hours/Year: (Numeric input, e.g., 4000)
+Operational Hours/Year: Default: 3000
 
-Anticipated Project Life (years): (Numeric input, e.g., 10)
+Anticipated Project Life (years): Default: 10
 
-4.2. Luminaire Specific Data (Under "DATA" Tab - repeated for Luminaire 1, Luminaire 2, Luminaire 3)
-Wattage (W): (Numeric input, e.g., 50) - This is the operational power of one luminaire.
+Maintenance Dimming Savings (%): Default: 10
 
-Flux Lumens (lm): (Numeric input, e.g., 5000)
+Maintenance Factor L70: Default: 0.70 (Used to adjust operational GWP for L70 scenarios)
 
-Efficacy (lm/W): (Numeric input, e.g., 100) - Note: This can be calculated (Flux / Wattage). Clarify if this input is for user reference, validation, or if it actively participates in calculations (e.g., for maintenance dimming scenarios). For now, treat as a direct input.
+Maintenance Factor L90: Default: 0.90 (Used to adjust operational GWP for L90 scenarios)
 
-Quantity: (Numeric input, e.g., 100) - Number of this luminaire type in the project.
+4.2. Luminaire Specific Data (Repeated for Luminaire 1, Luminaire 2, Luminaire 3 in the "DATA" Tab)
+Default values are based on the user-provided screenshot:
 
-Lifetime L70 (hours): (Numeric input, e.g., 50000)
+Luminaire 1 Defaults:
 
-Lifetime L90 (hours): (Numeric input, e.g., 30000)
+Wattage (W): 12
 
-GWP - Stage A (kgCO2e): (Numeric input, e.g., 5.5) - GWP for manufacturing one unit.
+Flux Lumens (lm): 1000
 
-GWP - EOL (kgCO2e): (Numeric input, e.g., 0.5) - GWP for end-of-life processing of one unit.
+Efficacy (lm/W): Auto-calculated (83.33), read-only.
 
-5. Calculations Required
-The core of the application is calculating the Total GWP for each luminaire under different conditions. The provided CSV ("GWP Luminaire Assessment & Comparison_Rev01.xlsx - L90 Analysis.csv") gives a detailed example of these calculations.
+Quantity: 120
 
-5.1. Intermediate Calculations (for each luminaire):
+Lifetime L70 (hours): 100000
+
+Lifetime L90 (hours): 50000
+
+GWP - Stage A (kgCO2e/unit): 10
+
+GWP - EOL (kgCO2e/unit): 0.5
+
+Luminaire 2 Defaults:
+
+Wattage (W): 10
+
+Flux Lumens (lm): 1000
+
+Efficacy (lm/W): Auto-calculated (100.00), read-only.
+
+Quantity: 100
+
+Lifetime L70 (hours): 80000
+
+Lifetime L90 (hours): 40000
+
+GWP - Stage A (kgCO2e/unit): 11
+
+GWP - EOL (kgCO2e/unit): 0.5
+
+Luminaire 3 Defaults:
+
+Wattage (W): 12
+
+Flux Lumens (lm): 900
+
+Efficacy (lm/W): Auto-calculated (75.00), read-only.
+
+Quantity: 130
+
+Lifetime L70 (hours): 70000
+
+Lifetime L90 (hours): 35000
+
+GWP - Stage A (kgCO2e/unit): 15
+
+GWP - EOL (kgCO2e/unit): 1
+
+5. Calculation Logic
+The core calculations are performed in JavaScript when the "Calculate & View Results" button is clicked.
+
 Total Operational Hours for Project:
 
 TotalOpHours = Operational Hours/Year * Anticipated Project Life (years)
 
-Number of Replacements:
+Number of Replacements (for Stage A & EOL calculations):
 
-Calculate separately for L70 and L90.
+Calculated separately for L70 and L90 scenarios for each luminaire.
 
-Replacements_L70 = ceil(TotalOpHours / Lifetime L70 (hours)) - 1 (Subtract 1 because the initial installation is not a replacement. Ensure it's at least 0).
+Replacements = max(0, ceil(TotalOpHours / Luminaire Lifetime (L70 or L90)) - 1)
 
-Replacements_L90 = ceil(TotalOpHours / Lifetime L90 (hours)) - 1 (Ensure it's at least 0).
+This determines the number of additional sets of luminaires needed after the initial installation.
 
-If lifetime is 0 or not provided, handle appropriately (e.g., assume infinite replacements or show an error).
+GWP Stage A (Manufacturing):
 
-5.2. GWP Component Calculations (for each luminaire, calculated for both L70 and L90 scenarios):
-Total GWP Stage A (Manufacturing):
+TotalGWP_A = GWP_Stage_A_per_unit * Quantity * (1 + Replacements)
 
-TotalGWP_A = GWP - Stage A (kgCO2e) * Quantity * (1 + Replacements)
+(1 + Replacements) accounts for the initial set plus all replacement sets.
 
-Calculate TotalGWP_A_L70 using Replacements_L70.
+GWP Stage EOL (End-of-Life):
 
-Calculate TotalGWP_A_L90 using Replacements_L90.
+TotalGWP_EOL = GWP_Stage_EOL_per_unit * Quantity * (1 + Replacements)
 
-Total GWP Stage B (Operational Use):
+GWP Stage B (Operational Use - Base, Unadjusted):
 
-EnergyConsumption_kWh_per_luminaire_per_year = Wattage (W) / 1000 * Operational Hours/Year
+BaseEnergyConsumption = (Wattage / 1000) * OperationalHoursYear * Quantity * AnticipatedProjectLife
 
-TotalEnergyConsumption_kWh_project_life = EnergyConsumption_kWh_per_luminaire_per_year * Quantity * Anticipated Project Life (years)
+GWP_B_Base_Unadjusted = BaseEnergyConsumption * CO2e_GridFactor
 
-Base_GWP_B = TotalEnergyConsumption_kWh_project_life * CO2e Grid Factor (kg/kWh)
+GWP Stage B (Adjusted by Maintenance Factor):
 
-This Base_GWP_B is the same for L70 and L90 scenarios as it depends on total operational hours, not lifetime directly for energy use (lifetime affects replacements for Stage A and EOL).
+For L70 scenarios: GWP_B_L70_Adjusted = GWP_B_Base_Unadjusted / MaintenanceFactorL70
 
-Total GWP EOL (End of Life):
+For L90 scenarios: GWP_B_L90_Adjusted = GWP_B_Base_Unadjusted / MaintenanceFactorL90
 
-TotalGWP_EOL = GWP - EOL (kgCO2e) * Quantity * (1 + Replacements)
+GWP Stage B (With Controls - L90 Baseline):
 
-Calculate TotalGWP_EOL_L70 using Replacements_L70.
+GWP_B_L90_Control = GWP_B_L90_Adjusted * (1 - ControlSystemSavings / 100)
 
-Calculate TotalGWP_EOL_L90 using Replacements_L90.
+GWP Stage B (With Controls & Maintenance Dimming - L90 Baseline):
 
-5.3. Total GWP Calculations (for each luminaire):
-Total GWP (L70):
+GWP_B_L90_Control_Maint = GWP_B_L90_Control * (1 - MaintenanceDimmingSavings / 100)
 
-TotalGWP_L70 = TotalGWP_A_L70 + Base_GWP_B + TotalGWP_EOL_L70
+Total GWP for Scenarios:
 
-Total GWP (L90):
+The total GWP for any given scenario is the sum of its calculated GWP_A, GWP_B_op (operational, adjusted as appropriate for the scenario), and GWP_EOL.
 
-TotalGWP_L90 = TotalGWP_A_L90 + Base_GWP_B + TotalGWP_EOL_L90
-
-5.4. GWP Calculations with Controls:
-GWP Stage B with Control:
-
-GWP_B_Control = Base_GWP_B * (1 - Control System Coefficient (%) / 100)
-
-Total GWP with Control (L70):
-
-TotalGWP_L70_Control = TotalGWP_A_L70 + GWP_B_Control + TotalGWP_EOL_L70
-
-Total GWP with Control (L90):
-
-TotalGWP_L90_Control = TotalGWP_A_L90 + GWP_B_Control + TotalGWP_EOL_L90
-
-5.5. GWP Calculations with Control and Maintenance Dimming:
-This is the most complex calculation. The PDF indicates this comparison, and the CSV has columns like "Maintained Circuit Power (W) per luminaire" and "GWP L90 - Stage B with Control & Maint. Dimming (Total)".
-
-Requirement: A clear formula or logic for how "Maintenance Dimming" affects the Wattage (W) or operational energy consumption over the luminaire's life is needed.
-
-Option 1 (Simplified): Assume maintenance dimming provides an additional fixed percentage saving on the operational energy after controls are applied. This would need a new input field like "Maintenance Dimming Savings (%)".
-
-Option 2 (Average Power): If maintenance dimming implies an average power consumption different from the input "Wattage (W)", this average power should be used for calculating GWP_B_Control_MaintDim. This might require an additional input field for "Average Dimmed Wattage (W)".
-
-Guidance: For the initial build, if the logic for maintenance dimming is not straightforward from the provided Excel/CSV formulas, this graph might need to be simplified or deferred. The CSV columns suggest a pre-calculated "Maintained Circuit Power" is used. If this is the case, the website might need an input for "Maintained Wattage (W)" in addition to "Initial Wattage (W)" when maintenance dimming is considered.
-
-Assuming a GWP_B_Control_MaintDim can be calculated:
-
-TotalGWP_L70_Control_MaintDim = TotalGWP_A_L70 + GWP_B_Control_MaintDim + TotalGWP_EOL_L70
-
-TotalGWP_L90_Control_MaintDim = TotalGWP_A_L90 + GWP_B_Control_MaintDim + TotalGWP_EOL_L90
-
-6. Outputs/Results Display (Under "RESULTS" Tab)
-The results should be displayed as bar charts. Each chart compares GWP values (in kgCO2e) for Luminaire 1, Luminaire 2, and Luminaire 3.
+6. Outputs/Results Display ("RESULTS" Tab)
+The results are visualized using three stacked bar charts generated by Chart.js. Each bar in the charts is divided into three segments representing GWP from Stage A (Manufacturing), Stage B (Operational), and Stage EOL.
 
 Chart 1: GWP L90 vs L70 Comparison
 
-Type: Grouped Bar Chart
+Compares two stacks per luminaire:
 
-X-axis: Luminaire 1, Luminaire 2, Luminaire 3
+Stack 1: L70 Scenario (GWP_A_L70, GWP_B_L70_Adjusted, GWP_EOL_L70)
 
-Y-axis: kgCO2e
+Stack 2: L90 Scenario (GWP_A_L90, GWP_B_L90_Adjusted, GWP_EOL_L90)
 
-For each luminaire, two bars:
+Chart 2: GWP Comparison With Control (L90 Baseline)
 
-Bar 1: TotalGWP_L70
+Compares two stacks per luminaire, both based on L90 lifetimes and L90 Maintenance Factor:
 
-Bar 2: TotalGWP_L90
+Stack 1: L90 Baseline (GWP_A_L90, GWP_B_L90_Adjusted, GWP_EOL_L90)
 
-Legend: "L70", "L90"
+Stack 2: L90 with Control (GWP_A_L90, GWP_B_L90_Control, GWP_EOL_L90)
 
-Chart 2: GWP Comparison With Control
+Chart 3: GWP With Control & Maintenance Dimming (L90 Baseline)
 
-Type: Grouped Bar Chart
+Compares two stacks per luminaire, both based on L90 lifetimes and L90 Maintenance Factor:
 
-X-axis: Luminaire 1, Luminaire 2, Luminaire 3
+Stack 1: L90 with Control (GWP_A_L90, GWP_B_L90_Control, GWP_EOL_L90)
 
-Y-axis: kgCO2e
+Stack 2: L90 with Control & Maintenance Dimming (GWP_A_L90, GWP_B_L90_Control_Maint, GWP_EOL_L90)
 
-For each luminaire, two bars (choose one lifetime for base comparison, e.g., L70, or make it selectable):
+Chart Styling:
 
-Bar 1: TotalGWP_L70 (or selected lifetime baseline)
+Font: Noto Sans
 
-Bar 2: TotalGWP_L70_Control (or selected lifetime with control)
+Colors: Operational (Blue), Manufacturing (Orange), EOL (Gray)
 
-Legend: "Baseline GWP (L70)", "GWP with Control (L70)" (Adjust legend based on chosen lifetime)
+Tooltips show the GWP for each segment on hover.
 
-Alternative: Could show four bars per luminaire: L70, L70+Control, L90, L90+Control. The PDF is simpler, implying a more direct comparison.
+Legend clearly identifies the GWP stages.
 
-Chart 3: GWP Comparison With Control And Maintenance Dimming
+7. Technologies Used
+HTML5: Structure of the application.
 
-Type: Grouped Bar Chart
+Tailwind CSS v3: For styling and responsive layout (loaded via CDN).
 
-X-axis: Luminaire 1, Luminaire 2, Luminaire 3
+JavaScript (ES6+): For all calculations, DOM manipulation, event handling, and Chart.js integration.
 
-Y-axis: kgCO2e
+Chart.js v3.x or v4.x: For creating dynamic and interactive stacked bar charts (loaded via CDN).
 
-For each luminaire, two bars (based on the GWP values derived from the maintenance dimming logic, e.g., using L70):
+Google Fonts: To load the "Noto Sans" font.
 
-Bar 1: TotalGWP_L70_Control
+8. How to Use/Run
+Save the entire HTML code as a single .html file (e.g., luminaire_gwp_calculator.html).
 
-Bar 2: TotalGWP_L70_Control_MaintDim
+Open this HTML file in any modern web browser (e.g., Chrome, Firefox, Edge, Safari).
 
-Legend: "GWP with Control (L70)", "GWP with Control & Maint. Dimming (L70)"
+The application will load with default values in the "DATA" tab.
 
-Note: The feasibility and accuracy of this chart depend heavily on the defined logic for "Maintenance Dimming" (see Section 5.5).
+Modify the project parameters and luminaire data as needed.
 
-7. Technologies (Suggestions)
-Frontend: HTML5, CSS3, JavaScript (ES6+)
+Click the "Calculate & View Results" button.
 
-Charting Library: A JavaScript library like Chart.js, ApexCharts, or D3.js (if more complex visualizations are needed). Chart.js is often a good balance of ease of use and capability for bar charts.
+The application will switch to the "RESULTS" tab and display the generated charts.
 
-No Backend Required: All calculations can be performed client-side in JavaScript.
+Use the "Back to Data" button to return to the input form and make further adjustments.
 
-Styling: Use CSS to match the clean and professional look of the PDF mock-up. Consider using a lightweight CSS framework or utility classes if it speeds up development, but custom styling will be needed.
+9. File Structure
+The entire application is contained within a single HTML file. This includes:
 
-8. Important Considerations for the AI
-Error Handling: Implement basic validation for inputs (e.g., numeric, non-negative). Handle cases like division by zero (e.g., if lifetime is 0).
+HTML markup for the structure.
 
-Clarity of Calculations: The GWP calculation logic, especially for operational use (Stage B) and the impact of controls and maintenance dimming, is critical. The formulas provided above are interpretations. Refer to standard LCA methodologies for lighting if further clarification is needed, or use the structure implied by the CSV column calculations.
+CSS styles (inline <style> block using Tailwind utility classes and some custom styles).
 
-User Experience: Ensure the interface is intuitive. Inputs should be clearly labeled. Results should update automatically or via a "Calculate" button when data changes.
+JavaScript code for logic and interactivity (inline <script> block).
 
-Maintenance Dimming Logic: This is the most ambiguous part. The AI will need to either:
-
-Implement a specific, pre-defined formula for how maintenance dimming affects energy consumption.
-
-Request clarification or make a reasonable, documented assumption (e.g., an additional percentage saving or requiring an "average power" input).
-
-Initially, it might be best to focus on the first two graphs and make the third graph dependent on a clear definition for maintenance dimming.
-
-Efficacy Input: Determine if the "Efficacy (lm/W)" input is actively used in calculations or is for informational purposes. If Wattage and Flux Lumens are provided, efficacy is Flux Lumens / Wattage. If the input efficacy is meant to reflect a maintained value or an average under dimming, this needs to be part of the maintenance dimming logic.
-
-9. Footer
-Include the text "Developed by Dimitrios Tsiokaras - dimitrios@electrolight.com" in the footer of the page, as shown in the PDF.
-
-This README should provide a solid foundation for the code-generating AI to develop the Luminaire GWP Calculator.
+This self-contained nature makes it easy to share and run.
