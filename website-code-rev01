@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Application Structure Plan: A two-tab single-page application. 
          'DATA' tab for all inputs. 
          'RESULTS' tab for charts.
@@ -16,11 +16,22 @@
     <!-- Visualization & Content Choices: 
          - Charts: Stacked bar charts for GWP components. Stage A & EOL GWP correctly includes replacements. -->
     <style>
-        body { font-family: 'Source Code Pro', monospace; }
-        .tab-button { transition: background-color 0.3s ease, color 0.3s ease; }
-        .tab-button.active { background-color: #e5e7eb; color: black; } /* gray-200 */
-        .tab-button:not(.active) { color: black; }
-        .tab-button:not(.active):hover { background-color: #f3f4f6; } /* gray-100 */
+        body { font-family: 'Noto Sans', sans-serif; }
+        .tab-button { 
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; 
+            border-bottom: 2px solid transparent;
+            padding-bottom: calc(0.75rem - 2px); /* Adjust padding to account for border */
+        }
+        .tab-button.active { 
+            border-bottom-color: black; 
+            color: black; 
+            font-weight: 500;
+        }
+        .tab-button:not(.active) { color: #4b5563; } /* gray-600 for inactive tab text */
+        .tab-button:not(.active):hover { 
+            border-bottom-color: #d1d5db; /* gray-300 for hover */
+            color: black;
+        }
         .chart-container {
             position: relative;
             width: 100%;
@@ -31,8 +42,8 @@
             max-height: 450px;
             padding: 1rem;
             background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-radius: 0.25rem; /* Slightly less rounded */
+            border: 1px solid #e5e7eb; /* gray-200 border */
         }
         @media (min-width: 768px) { 
             .chart-container { height: 450px; }
@@ -48,62 +59,77 @@
             -webkit-appearance: none;
             margin: 0;
         }
+        .form-input {
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.25rem;
+            box-shadow: none;
+        }
+        .form-input:focus {
+            border-color: #6b7280; /* gray-500 */
+            box-shadow: 0 0 0 1px #6b7280;
+            outline: none;
+        }
+        .simple-section {
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
-<body class="bg-stone-100 text-black min-h-screen flex flex-col">
+<body class="bg-gray-50 text-black min-h-screen flex flex-col">
 
-    <header class="bg-white shadow-md py-6">
+    <header class="bg-white py-6 border-b border-gray-200">
         <h1 class="text-3xl font-bold text-center text-black">LUMINAIRE GWP CALCULATOR AND COMPARISON TOOL</h1>
+        <p class="text-xs text-gray-600 text-center mt-1">Developed by Dimitrios Tsiokaras - dimitrios@electrolight.com</p>
     </header>
 
     <main class="container mx-auto px-4 py-8 flex-grow">
-        <div class="bg-white p-6 rounded-lg shadow-xl">
-            <div class="mb-6 border-b border-stone-300">
-                <nav class="flex space-x-1" aria-label="Tabs">
-                    <button id="tab-data-btn" type="button" class="tab-button active px-4 py-3 font-medium text-sm rounded-t-md focus:outline-none">
+        <div class="bg-white p-6 rounded-md border border-gray-200">
+            <div class="mb-6 border-b border-gray-300">
+                <nav class="flex space-x-2" aria-label="Tabs">
+                    <button id="tab-data-btn" type="button" class="tab-button active px-4 py-3 font-medium text-sm focus:outline-none">
                         DATA
                     </button>
-                    <button id="tab-results-btn" type="button" class="tab-button px-4 py-3 font-medium text-sm rounded-t-md focus:outline-none">
+                    <button id="tab-results-btn" type="button" class="tab-button px-4 py-3 font-medium text-sm focus:outline-none">
                         RESULTS
                     </button>
                 </nav>
             </div>
 
             <div id="tab-data-content">
-                <p class="text-gray-700 mb-6">
+                <p class="text-gray-600 mb-6 text-sm">
                     Enter the project-specific parameters and the technical data for up to three luminaires you wish to compare. All fields are required for accurate GWP calculations. Once data is entered, click "Calculate & View Results".
                 </p>
                 <form id="gwpForm">
-                    <section id="projectParams" class="mb-8 p-6 bg-stone-50 rounded-lg shadow">
+                    <section id="projectParams" class="mb-8 p-6 bg-gray-50 simple-section">
                         <h2 class="text-xl font-semibold text-black mb-4">Project Parameters</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div>
                                 <label for="co2GridFactor" class="block text-sm font-medium text-black mb-1">CO2e Grid Factor (kg/kWh)</label>
-                                <input type="number" id="co2GridFactor" value="0.233" step="0.001" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                                <input type="number" id="co2GridFactor" value="0.233" step="0.001" class="form-input w-full p-2">
                             </div>
                             <div>
                                 <label for="controlSystemCoefficient" class="block text-sm font-medium text-black mb-1">Control System Savings (%)</label>
-                                <input type="number" id="controlSystemCoefficient" value="30" step="1" min="0" max="100" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                                <input type="number" id="controlSystemCoefficient" value="30" step="1" min="0" max="100" class="form-input w-full p-2">
                             </div>
                             <div>
                                 <label for="operationalHoursYear" class="block text-sm font-medium text-black mb-1">Operational Hours/Year</label>
-                                <input type="number" id="operationalHoursYear" value="3000" step="100" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                                <input type="number" id="operationalHoursYear" value="3000" step="100" class="form-input w-full p-2">
                             </div>
                             <div>
                                 <label for="anticipatedProjectLife" class="block text-sm font-medium text-black mb-1">Anticipated Project Life (years)</label>
-                                <input type="number" id="anticipatedProjectLife" value="10" step="1" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                                <input type="number" id="anticipatedProjectLife" value="10" step="1" class="form-input w-full p-2">
                             </div>
                             <div>
                                 <label for="maintenanceDimmingSavings" class="block text-sm font-medium text-black mb-1">Maintenance Dimming Savings (%)</label>
-                                <input type="number" id="maintenanceDimmingSavings" value="10" step="1" min="0" max="100" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500" title="Additional savings on operational energy after control system savings are applied.">
+                                <input type="number" id="maintenanceDimmingSavings" value="10" step="1" min="0" max="100" class="form-input w-full p-2" title="Additional savings on operational energy after control system savings are applied.">
                             </div>
                             <div>
                                 <label for="maintenanceFactorL70" class="block text-sm font-medium text-black mb-1">Maintenance Factor L70</label>
-                                <input type="number" id="maintenanceFactorL70" value="0.70" step="0.01" min="0.01" max="1" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500" title="E.g., 0.70. Applied to adjust operational GWP for L70 calculations.">
+                                <input type="number" id="maintenanceFactorL70" value="0.70" step="0.01" min="0.01" max="1" class="form-input w-full p-2" title="E.g., 0.70. Applied to adjust operational GWP for L70 calculations.">
                             </div>
                             <div>
                                 <label for="maintenanceFactorL90" class="block text-sm font-medium text-black mb-1">Maintenance Factor L90</label>
-                                <input type="number" id="maintenanceFactorL90" value="0.90" step="0.01" min="0.01" max="1" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500" title="E.g., 0.90. Applied to adjust operational GWP for L90 calculations.">
+                                <input type="number" id="maintenanceFactorL90" value="0.90" step="0.01" min="0.01" max="1" class="form-input w-full p-2" title="E.g., 0.90. Applied to adjust operational GWP for L90 calculations.">
                             </div>
                         </div>
                     </section>
@@ -112,7 +138,7 @@
                         </div>
 
                     <div class="mt-8 text-center">
-                        <button type="submit" class="bg-black hover:bg-gray-800 text-white font-semibold py-3 px-8 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-150 ease-in-out">
+                        <button type="submit" class="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-md border border-black focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition duration-150 ease-in-out">
                             Calculate & View Results
                         </button>
                     </div>
@@ -120,21 +146,21 @@
             </div>
 
             <div id="tab-results-content" class="hidden">
-                <p class="text-gray-700 mb-6">
+                <p class="text-gray-600 mb-6 text-sm">
                     The charts below illustrate the Global Warming Potential (GWP) comparisons for the entered luminaires, broken down by lifecycle stage. Operational GWP (Stage B) is adjusted by the specified maintenance factors. Manufacturing (Stage A) and End-of-Life (EOL) GWP include replacements. Lower bars indicate a lower environmental impact.
                 </p>
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
                     <div class="space-y-8">
                         <div>
                             <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP L90 vs L70 Comparison</h3>
-                            <p class="text-sm text-gray-700 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire when considering L70 lifetime versus L90 lifetime. Stage B GWP is adjusted by L70 and L90 maintenance factors respectively.</p>
+                            <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire when considering L70 lifetime versus L90 lifetime. Stage B GWP is adjusted by L70 and L90 maintenance factors respectively.</p>
                             <div class="chart-container">
                                 <canvas id="gwpL70L90Chart"></canvas>
                             </div>
                         </div>
                         <div>
                             <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP Comparison With Control (L90 Baseline)</h3>
-                            <p class="text-sm text-gray-700 mb-3 text-center">Shows GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF), comparing baseline operation versus operation with control system savings.</p>
+                            <p class="text-sm text-gray-600 mb-3 text-center">Shows GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF), comparing baseline operation versus operation with control system savings.</p>
                             <div class="chart-container">
                                 <canvas id="gwpControlChart"></canvas>
                             </div>
@@ -143,7 +169,7 @@
                     <div class="space-y-8 xl:mt-0">
                          <div>
                             <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP With Control & Maintenance Dimming (L90 Baseline)</h3>
-                            <p class="text-sm text-gray-700 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF): with control system savings versus with both control system and maintenance dimming savings applied.</p>
+                            <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF): with control system savings versus with both control system and maintenance dimming savings applied.</p>
                             <div class="chart-container">
                                 <canvas id="gwpMaintenanceDimmingChart"></canvas>
                             </div>
@@ -151,7 +177,7 @@
                     </div>
                 </div>
                  <div class="mt-8 text-center">
-                    <button id="backToDataBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-150 ease-in-out mr-4">
+                    <button id="backToDataBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition duration-150 ease-in-out mr-4">
                         Back to Data
                     </button>
                 </div>
@@ -159,8 +185,8 @@
         </div>
     </main>
 
-    <footer class="text-center py-6 bg-stone-200 text-sm text-gray-700 mt-auto">
-        Developed by Dimitrios Tsiokaras - dimitrios@electrolight.com
+    <footer class="text-center py-4 bg-gray-100 border-t border-gray-200 mt-auto">
+        <p class="text-xs text-gray-500">Luminaire GWP Calculator v1.0</p>
     </footer>
 
     <script>
@@ -182,7 +208,7 @@
             eol: '#6b7280'    // stone-500 (EOL Stage EOL)
         };
         
-        Chart.defaults.font.family = 'Source Code Pro'; // Set default font for all charts
+        Chart.defaults.font.family = 'Noto Sans'; // Set default font for all charts
 
         const commonChartOptions = {
             responsive: true,
@@ -191,14 +217,14 @@
                 y: {
                     beginAtZero: true,
                     stacked: true,
-                    ticks: { color: '#000000', font: { family: 'Source Code Pro'} }, 
-                    grid: { color: '#e7e5e4' },
-                    title: { display: true, text: 'GWP (kgCO2e)', color: '#000000', font: { family: 'Source Code Pro', weight: 'bold'}} 
+                    ticks: { color: '#000000', font: { family: 'Noto Sans'} }, 
+                    grid: { color: '#e5e7eb' }, // gray-200
+                    title: { display: true, text: 'GWP (kgCO2e)', color: '#000000', font: { family: 'Noto Sans', weight: '500'}} 
                 },
                 x: {
                     stacked: true,
                     ticks: { 
-                        color: '#000000', maxRotation: 0, minRotation: 0, autoSkip: false, font: { family: 'Source Code Pro'},
+                        color: '#000000', maxRotation: 0, minRotation: 0, autoSkip: false, font: { family: 'Noto Sans'},
                         callback: function(value) {
                             const label = this.getLabelForValue(value);
                             return label.length > 16 ? label.substring(0, 15) + '...' : label;
@@ -211,7 +237,7 @@
                 legend: {
                     position: 'top',
                     labels: {
-                        color: '#000000', boxWidth: 15, padding: 20, font: { family: 'Source Code Pro'}, 
+                        color: '#000000', boxWidth: 15, padding: 20, font: { family: 'Noto Sans'}, 
                         filter: function(legendItem) {
                             const baseLabel = legendItem.text.split(' - ')[0];
                             if (!shownLabelsForLegend[baseLabel]) {
@@ -223,9 +249,9 @@
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.8)', titleColor: 'white', bodyColor: 'white', mode: 'index', 
-                    titleFont: { family: 'Source Code Pro' },
-                    bodyFont: { family: 'Source Code Pro' },
+                    backgroundColor: 'rgba(0,0,0,0.85)', titleColor: 'white', bodyColor: 'white', mode: 'index', 
+                    titleFont: { family: 'Noto Sans', weight: '500' },
+                    bodyFont: { family: 'Noto Sans' },
                     callbacks: {
                         label: function(context) {
                             let label = context.dataset.label || '';
@@ -252,17 +278,17 @@
             let defaultEfficacyVal = (defaultWattageVal > 0 && defaultFluxVal >= 0) ? (defaultFluxVal / defaultWattageVal).toFixed(2) : '';
             
             return `
-            <section id="luminaire${i}" class="p-6 bg-stone-50 rounded-lg shadow">
+            <section id="luminaire${i}" class="p-6 bg-gray-50 simple-section">
                 <h2 class="text-xl font-semibold text-black mb-4">Luminaire ${i}</h2>
                 <div class="space-y-4">
-                    <div><label for="wattage${i}" class="block text-sm font-medium text-black mb-1">Wattage (W)</label><input type="number" id="wattage${i}" value="${defaultWattageVal}" step="0.1" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"></div>
-                    <div><label for="fluxLumen${i}" class="block text-sm font-medium text-black mb-1">Flux Lumens (lm)</label><input type="number" id="fluxLumen${i}" value="${defaultFluxVal}" step="10" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"></div>
-                    <div><label for="efficacy${i}" class="block text-sm font-medium text-black mb-1">Efficacy (lm/W)</label><input type="number" id="efficacy${i}" value="${defaultEfficacyVal}" step="0.01" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500" readonly title="Calculated as Flux Lumens / Wattage. Informational."></div>
-                    <div><label for="quantity${i}" class="block text-sm font-medium text-black mb-1">Quantity</label><input type="number" id="quantity${i}" value="${defaultQuantityVals[i-1]}" step="1" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"></div>
-                    <div><label for="lifetimeL70_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L70 (hours)</label><input type="number" id="lifetimeL70_${i}" value="${defaultL70Vals[i-1]}" step="1000" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"></div>
-                    <div><label for="lifetimeL90_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L90 (hours)</label><input type="number" id="lifetimeL90_${i}" value="${defaultL90Vals[i-1]}" step="1000" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"></div>
-                    <div><label for="gwpStageA${i}" class="block text-sm font-medium text-black mb-1">GWP - Stage A (kgCO2e/unit)</label><input type="number" id="gwpStageA${i}" value="${defaultGwpAVals[i-1]}" step="0.1" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"></div>
-                    <div><label for="gwpEOL${i}" class="block text-sm font-medium text-black mb-1">GWP - EOL (kgCO2e/unit)</label><input type="number" id="gwpEOL${i}" value="${defaultGwpEOLVals[i-1]}" step="0.1" class="w-full p-2 border border-stone-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500"></div>
+                    <div><label for="wattage${i}" class="block text-sm font-medium text-black mb-1">Wattage (W)</label><input type="number" id="wattage${i}" value="${defaultWattageVal}" step="0.1" class="form-input w-full p-2"></div>
+                    <div><label for="fluxLumen${i}" class="block text-sm font-medium text-black mb-1">Flux Lumens (lm)</label><input type="number" id="fluxLumen${i}" value="${defaultFluxVal}" step="10" class="form-input w-full p-2"></div>
+                    <div><label for="efficacy${i}" class="block text-sm font-medium text-black mb-1">Efficacy (lm/W)</label><input type="number" id="efficacy${i}" value="${defaultEfficacyVal}" step="0.01" class="form-input w-full p-2" readonly title="Calculated as Flux Lumens / Wattage. Informational."></div>
+                    <div><label for="quantity${i}" class="block text-sm font-medium text-black mb-1">Quantity</label><input type="number" id="quantity${i}" value="${defaultQuantityVals[i-1]}" step="1" class="form-input w-full p-2"></div>
+                    <div><label for="lifetimeL70_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L70 (hours)</label><input type="number" id="lifetimeL70_${i}" value="${defaultL70Vals[i-1]}" step="1000" class="form-input w-full p-2"></div>
+                    <div><label for="lifetimeL90_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L90 (hours)</label><input type="number" id="lifetimeL90_${i}" value="${defaultL90Vals[i-1]}" step="1000" class="form-input w-full p-2"></div>
+                    <div><label for="gwpStageA${i}" class="block text-sm font-medium text-black mb-1">GWP - Stage A (kgCO2e/unit)</label><input type="number" id="gwpStageA${i}" value="${defaultGwpAVals[i-1]}" step="0.1" class="form-input w-full p-2"></div>
+                    <div><label for="gwpEOL${i}" class="block text-sm font-medium text-black mb-1">GWP - EOL (kgCO2e/unit)</label><input type="number" id="gwpEOL${i}" value="${defaultGwpEOLVals[i-1]}" step="0.1" class="form-input w-full p-2"></div>
                 </div>
             </section>`;
         }
@@ -346,10 +372,10 @@
 
                 const totalOpHours = projectParams.operationalHoursYear * projectParams.anticipatedProjectLife;
                 const calcGwp_A_EOL_Components = (lifetime) => {
-                    const replacements = Math.max(0, Math.ceil(totalOpHours / lifetime) - 1); // Number of replacement sets
+                    const replacements = Math.max(0, Math.ceil(totalOpHours / lifetime) - 1); 
                     return { 
-                        gwp_A: luminaireInputs.gwpStageA_unit * luminaireInputs.quantity * (1 + replacements), // Initial set + replacements
-                        gwp_EOL: luminaireInputs.gwpEOL_unit * luminaireInputs.quantity * (1 + replacements) // Initial set + replacements
+                        gwp_A: luminaireInputs.gwpStageA_unit * luminaireInputs.quantity * (1 + replacements), 
+                        gwp_EOL: luminaireInputs.gwpEOL_unit * luminaireInputs.quantity * (1 + replacements) 
                     };
                 };
 
