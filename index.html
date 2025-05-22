@@ -149,30 +149,26 @@
                 <p class="text-gray-600 mb-6 text-sm">
                     The charts below illustrate the Global Warming Potential (GWP) comparisons for the entered luminaires, broken down by lifecycle stage. Operational GWP (Stage B) is adjusted by the specified maintenance factors. Manufacturing (Stage A) and End-of-Life (EOL) GWP include replacements. Lower bars indicate a lower environmental impact.
                 </p>
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    <div class="space-y-8">
-                        <div>
-                            <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP L90 vs L70 Comparison</h3>
-                            <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire when considering L70 lifetime versus L90 lifetime. Stage B GWP is adjusted by L70 and L90 maintenance factors respectively.</p>
-                            <div class="chart-container">
-                                <canvas id="gwpL70L90Chart"></canvas>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP Comparison With Control (L90 Baseline)</h3>
-                            <p class="text-sm text-gray-600 mb-3 text-center">Shows GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF), comparing baseline operation versus operation with control system savings.</p>
-                            <div class="chart-container">
-                                <canvas id="gwpControlChart"></canvas>
-                            </div>
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP L90 vs L70 Comparison</h3>
+                        <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire when considering L70 lifetime versus L90 lifetime. Stage B GWP is adjusted by L70 and L90 maintenance factors respectively.</p>
+                        <div class="chart-container">
+                            <canvas id="gwpL70L90Chart"></canvas>
                         </div>
                     </div>
-                    <div class="space-y-8 xl:mt-0">
-                         <div>
-                            <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP With Control & Maintenance Dimming (L90 Baseline)</h3>
-                            <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF): with control system savings versus with both control system and maintenance dimming savings applied.</p>
-                            <div class="chart-container">
-                                <canvas id="gwpMaintenanceDimmingChart"></canvas>
-                            </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP Comparison With Control (L90 Baseline)</h3>
+                        <p class="text-sm text-gray-600 mb-3 text-center">Shows GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF), comparing baseline operation versus operation with control system savings.</p>
+                        <div class="chart-container">
+                            <canvas id="gwpControlChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP With Control & Maintenance Dimming (L90 Baseline)</h3>
+                        <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF): with control system savings versus with both control system and maintenance dimming savings applied.</p>
+                        <div class="chart-container">
+                            <canvas id="gwpMaintenanceDimmingChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -283,7 +279,7 @@
                 <div class="space-y-4">
                     <div><label for="wattage${i}" class="block text-sm font-medium text-black mb-1">Wattage (W)</label><input type="number" id="wattage${i}" value="${defaultWattageVal}" step="0.1" class="form-input w-full p-2"></div>
                     <div><label for="fluxLumen${i}" class="block text-sm font-medium text-black mb-1">Flux Lumens (lm)</label><input type="number" id="fluxLumen${i}" value="${defaultFluxVal}" step="10" class="form-input w-full p-2"></div>
-                    <div><label for="efficacy${i}" class="block text-sm font-medium text-black mb-1">Efficacy (lm/W)</label><input type="number" id="efficacy${i}" value="${defaultEfficacyVal}" step="0.01" class="form-input w-full p-2" readonly title="Calculated as Flux Lumens / Wattage. Informational."></div>
+                    <div><label for="efficacy${i}" class="block text-sm font-medium text-black mb-1">Efficacy (lm/W)</label><input type="number" id="efficacy${i}" value="${defaultEfficacyVal}" step="0.01" class="form-input w-full p-2 bg-gray-100 text-gray-600" readonly title="Calculated as Flux Lumens / Wattage. Informational."></div>
                     <div><label for="quantity${i}" class="block text-sm font-medium text-black mb-1">Quantity</label><input type="number" id="quantity${i}" value="${defaultQuantityVals[i-1]}" step="1" class="form-input w-full p-2"></div>
                     <div><label for="lifetimeL70_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L70 (hours)</label><input type="number" id="lifetimeL70_${i}" value="${defaultL70Vals[i-1]}" step="1000" class="form-input w-full p-2"></div>
                     <div><label for="lifetimeL90_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L90 (hours)</label><input type="number" id="lifetimeL90_${i}" value="${defaultL90Vals[i-1]}" step="1000" class="form-input w-full p-2"></div>
@@ -409,22 +405,45 @@
                 { label: `EOL${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_EOL), backgroundColor: stageColors.eol, stack: `stack_${stackGroup}` }
             ];
         }
-        
+
         function updateCharts(data) {
             const labels = data.map(d => d.name);
             shownLabelsForLegend = {}; 
 
+            // Calculate the maximum total GWP across all scenarios to ensure consistent scaling
+            const maxGwpValues = [];
+            data.forEach(d => {
+                maxGwpValues.push(d.l70_base.gwp_A + d.l70_base.gwp_B_op + d.l70_base.gwp_EOL);
+                maxGwpValues.push(d.l90_base.gwp_A + d.l90_base.gwp_B_op + d.l90_base.gwp_EOL);
+                maxGwpValues.push(d.l90_control.gwp_A + d.l90_control.gwp_B_op + d.l90_control.gwp_EOL);
+                maxGwpValues.push(d.l90_control_maint.gwp_A + d.l90_control_maint.gwp_B_op + d.l90_control_maint.gwp_EOL);
+            });
+            const maxGwp = Math.max(...maxGwpValues);
+            const yAxisMax = Math.ceil(maxGwp * 1.1); // Add 10% padding
+
+            // Create chart options with consistent y-axis maximum
+            const consistentChartOptions = {
+                ...commonChartOptions,
+                scales: {
+                    ...commonChartOptions.scales,
+                    y: {
+                        ...commonChartOptions.scales.y,
+                        max: yAxisMax
+                    }
+                }
+            };
+
             if (gwpL70L90ChartInstance) gwpL70L90ChartInstance.destroy();
             gwpL70L90ChartInstance = new Chart(document.getElementById('gwpL70L90Chart'), {
-                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l70_base', 'L70', 'L70'), ...createStackedDatasets(data, 'l90_base', 'L90', 'L90')]}, options: commonChartOptions });
+                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l70_base', 'L70', 'L70'), ...createStackedDatasets(data, 'l90_base', 'L90', 'L90')]}, options: consistentChartOptions });
 
             if (gwpControlChartInstance) gwpControlChartInstance.destroy();
             gwpControlChartInstance = new Chart(document.getElementById('gwpControlChart'), {
-                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l90_base', 'L90 Baseline', 'L90Base'), ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90Control')]}, options: commonChartOptions });
+                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l90_base', 'L90 Baseline', 'L90Base'), ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90Control')]}, options: consistentChartOptions });
             
             if (gwpMaintenanceDimmingChartInstance) gwpMaintenanceDimmingChartInstance.destroy();
             gwpMaintenanceDimmingChartInstance = new Chart(document.getElementById('gwpMaintenanceDimmingChart'), {
-                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90ControlAgain'), ...createStackedDatasets(data, 'l90_control_maint', 'L90 w/ Control & Maint. Dimming', 'L90ControlMaint')]}, options: commonChartOptions });
+                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90ControlAgain'), ...createStackedDatasets(data, 'l90_control_maint', 'L90 w/ Control & Maint. Dimming', 'L90ControlMaint')]}, options: consistentChartOptions });
         }
         
         switchToTab('data'); 
