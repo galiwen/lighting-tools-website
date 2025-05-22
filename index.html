@@ -35,11 +35,11 @@
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 700px;
+            max-width: 700px; /* Max width for the container */
             margin-left: auto;
             margin-right: auto;
             height: 400px; 
-            max-height: 450px;
+            max-height: 450px; /* Max height for the container */
             padding: 1rem;
             background-color: white;
             border-radius: 0.25rem; /* Slightly less rounded */
@@ -49,7 +49,7 @@
             .chart-container { height: 450px; }
         }
         @media (max-width: 639px) { 
-            .chart-container { height: 350px; }
+            .chart-container { height: 350px; } /* Adjust height for smaller screens */
         }
         input[type="number"] {
             -moz-appearance: textfield;
@@ -195,26 +195,31 @@
         const luminairesGridContainer = document.getElementById('luminairesGridContainer');
 
         let gwpL70L90ChartInstance, gwpControlChartInstance, gwpMaintenanceDimmingChartInstance;
-        let shownLabelsForLegend = {}; 
         let currentLuminairesDataStorage = []; 
 
-        const stageColors = {
+        // Define primary and secondary color sets for chart bars
+        const stageColorsPrimary = {
             op: '#3b82f6',    // blue-500 (Operational Stage B)
             mfg: '#f97316',   // orange-500 (Manufacturing Stage A)
-            eol: '#6b7280'    // stone-500 (EOL Stage EOL)
+            eol: '#6b7280'    // gray-500 (EOL Stage EOL)
+        };
+        const stageColorsSecondary = { // Lighter versions for comparison
+            op: '#60a5fa',    // blue-400
+            mfg: '#fb923c',   // orange-400
+            eol: '#9ca3af'    // gray-400
         };
         
         Chart.defaults.font.family = 'Noto Sans'; // Set default font for all charts
 
         const commonChartOptions = {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false, 
             scales: {
                 y: {
                     beginAtZero: true,
                     stacked: true,
                     ticks: { color: '#000000', font: { family: 'Noto Sans'} }, 
-                    grid: { color: '#e5e7eb' }, // gray-200
+                    grid: { color: '#e5e7eb' }, 
                     title: { display: true, text: 'GWP (kgCO2e)', color: '#000000', font: { family: 'Noto Sans', weight: '500'}} 
                 },
                 x: {
@@ -231,27 +236,20 @@
             },
             plugins: {
                 legend: {
-                    position: 'top',
-                    labels: {
-                        color: '#000000', boxWidth: 15, padding: 20, font: { family: 'Noto Sans'}, 
-                        filter: function(legendItem) {
-                            const baseLabel = legendItem.text.split(' - ')[0];
-                            if (!shownLabelsForLegend[baseLabel]) {
-                                shownLabelsForLegend[baseLabel] = true;
-                                return true;
-                            }
-                            return false;
-                        }
-                    }
+                    display: false // Remove the legend (key)
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0,0,0,0.85)', titleColor: 'white', bodyColor: 'white', mode: 'index', 
+                    mode: 'point', // Tooltip will appear for the specific bar segment hovered
+                    intersect: true, // Tooltip will only appear if the mouse intersects a bar segment
+                    backgroundColor: 'rgba(0,0,0,0.85)', 
+                    titleColor: 'white', 
+                    bodyColor: 'white', 
                     titleFont: { family: 'Noto Sans', weight: '500' },
                     bodyFont: { family: 'Noto Sans' },
                     callbacks: {
                         label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) label = label.split(' - ')[0] + ': ';
+                            let label = context.dataset.label || ''; // Full label e.g., "Operational (B) - L70"
+                            if (label) label = label + ': '; 
                             if (context.parsed.y !== null) label += context.parsed.y.toFixed(2) + ' kgCO2e';
                             return label;
                         }
@@ -261,6 +259,7 @@
         };
 
         function renderLuminaireHTML(i) {
+            // Default values for luminaire inputs
             const defaultWattageVals = [12, 10, 12];
             const defaultFluxVals = [1000, 1000, 900];
             const defaultQuantityVals = [120, 100, 130];
@@ -295,7 +294,7 @@
                 const wattageEl = document.getElementById(`wattage${i}`);
                 const fluxEl = document.getElementById(`fluxLumen${i}`);
                 const efficacyEl = document.getElementById(`efficacy${i}`);
-                if (!wattageEl || !fluxEl || !efficacyEl) continue;
+                if (!wattageEl || !fluxEl || !efficacyEl) continue; 
                 function updateEfficacy() {
                     const wattage = parseFloat(wattageEl.value);
                     const flux = parseFloat(fluxEl.value);
@@ -329,9 +328,9 @@
         }
 
         gwpForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            if (calculateAndDisplayResults()) {
-                switchToTab('results');
+            event.preventDefault(); 
+            if (calculateAndDisplayResults()) { 
+                switchToTab('results'); 
             }
         });
 
@@ -347,7 +346,7 @@
             };
 
             if (Object.values(projectParams).some(isNaN) || projectParams.maintenanceFactorL70 <= 0 || projectParams.maintenanceFactorL90 <= 0) {
-                alert("Ensure all Project Parameters are valid numbers and maintenance factors are > 0.");
+                window.alert("Ensure all Project Parameters are valid numbers and maintenance factors are > 0.");
                 return false;
             }
 
@@ -362,7 +361,7 @@
                 };
 
                 if (Object.values(luminaireInputs).slice(1).some(isNaN) || luminaireInputs.lifetimeL70 <= 0 || luminaireInputs.lifetimeL90 <= 0) {
-                    alert(`Ensure all fields for Luminaire ${i} are valid numbers and lifetimes > 0.`);
+                    window.alert(`Ensure all fields for Luminaire ${i} are valid numbers and lifetimes > 0.`);
                     return false;
                 }
 
@@ -393,24 +392,22 @@
                     l90_control_maint: { gwp_A: componentsL90_AEOL.gwp_A, gwp_B_op: gwp_B_L90_control_maint, gwp_EOL: componentsL90_AEOL.gwp_EOL }
                 });
             }
-            updateCharts(currentLuminairesDataStorage);
-            return true;
+            updateCharts(currentLuminairesDataStorage); 
+            return true; 
         }
 
-        function createStackedDatasets(data, scenarioKey, scenarioDisplayName, stackGroup) {
+        function createStackedDatasets(data, scenarioKey, scenarioDisplayName, stackGroup, colorSet) {
             const displaySuffix = scenarioDisplayName ? ` - ${scenarioDisplayName}` : '';
             return [
-                { label: `Operational (B)${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_B_op), backgroundColor: stageColors.op, stack: `stack_${stackGroup}` },
-                { label: `Manufacturing (A)${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_A), backgroundColor: stageColors.mfg, stack: `stack_${stackGroup}` },
-                { label: `EOL${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_EOL), backgroundColor: stageColors.eol, stack: `stack_${stackGroup}` }
+                { label: `Operational (B)${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_B_op), backgroundColor: colorSet.op, stack: `stack_${stackGroup}` },
+                { label: `Manufacturing (A)${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_A), backgroundColor: colorSet.mfg, stack: `stack_${stackGroup}` },
+                { label: `EOL${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_EOL), backgroundColor: colorSet.eol, stack: `stack_${stackGroup}` }
             ];
         }
 
         function updateCharts(data) {
-            const labels = data.map(d => d.name);
-            shownLabelsForLegend = {}; 
+            const labels = data.map(d => d.name); 
 
-            // Calculate the maximum total GWP across all scenarios to ensure consistent scaling
             const maxGwpValues = [];
             data.forEach(d => {
                 maxGwpValues.push(d.l70_base.gwp_A + d.l70_base.gwp_B_op + d.l70_base.gwp_EOL);
@@ -418,32 +415,58 @@
                 maxGwpValues.push(d.l90_control.gwp_A + d.l90_control.gwp_B_op + d.l90_control.gwp_EOL);
                 maxGwpValues.push(d.l90_control_maint.gwp_A + d.l90_control_maint.gwp_B_op + d.l90_control_maint.gwp_EOL);
             });
-            const maxGwp = Math.max(...maxGwpValues);
-            const yAxisMax = Math.ceil(maxGwp * 1.1); // Add 10% padding
+            const maxGwp = Math.max(0, ...maxGwpValues); 
+            const yAxisMax = Math.ceil(maxGwp * 1.1) || 10; 
 
-            // Create chart options with consistent y-axis maximum
             const consistentChartOptions = {
-                ...commonChartOptions,
+                ...commonChartOptions, 
                 scales: {
-                    ...commonChartOptions.scales,
+                    ...commonChartOptions.scales, 
                     y: {
-                        ...commonChartOptions.scales.y,
-                        max: yAxisMax
+                        ...commonChartOptions.scales.y, 
+                        max: yAxisMax 
                     }
                 }
             };
 
-            if (gwpL70L90ChartInstance) gwpL70L90ChartInstance.destroy();
+            if (gwpL70L90ChartInstance) gwpL70L90ChartInstance.destroy(); 
             gwpL70L90ChartInstance = new Chart(document.getElementById('gwpL70L90Chart'), {
-                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l70_base', 'L70', 'L70'), ...createStackedDatasets(data, 'l90_base', 'L90', 'L90')]}, options: consistentChartOptions });
+                type: 'bar', 
+                data: { 
+                    labels, 
+                    datasets: [ 
+                        ...createStackedDatasets(data, 'l70_base', 'L70', 'L70', stageColorsPrimary), 
+                        ...createStackedDatasets(data, 'l90_base', 'L90', 'L90', stageColorsSecondary) 
+                    ]
+                }, 
+                options: consistentChartOptions 
+            });
 
             if (gwpControlChartInstance) gwpControlChartInstance.destroy();
             gwpControlChartInstance = new Chart(document.getElementById('gwpControlChart'), {
-                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l90_base', 'L90 Baseline', 'L90Base'), ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90Control')]}, options: consistentChartOptions });
+                type: 'bar', 
+                data: { 
+                    labels, 
+                    datasets: [ 
+                        ...createStackedDatasets(data, 'l90_base', 'L90 Baseline', 'L90Base', stageColorsPrimary), 
+                        ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90Control', stageColorsSecondary) 
+                    ]
+                }, 
+                options: consistentChartOptions 
+            });
             
             if (gwpMaintenanceDimmingChartInstance) gwpMaintenanceDimmingChartInstance.destroy();
             gwpMaintenanceDimmingChartInstance = new Chart(document.getElementById('gwpMaintenanceDimmingChart'), {
-                type: 'bar', data: { labels, datasets: [ ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90ControlAgain'), ...createStackedDatasets(data, 'l90_control_maint', 'L90 w/ Control & Maint. Dimming', 'L90ControlMaint')]}, options: consistentChartOptions });
+                type: 'bar', 
+                data: { 
+                    labels, 
+                    datasets: [ 
+                        ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90ControlAgain', stageColorsPrimary), 
+                        ...createStackedDatasets(data, 'l90_control_maint', 'L90 w/ Control & Maint. Dimming', 'L90ControlMaint', stageColorsSecondary) 
+                    ]
+                }, 
+                options: consistentChartOptions 
+            });
         }
         
         switchToTab('data'); 
