@@ -1,477 +1,1540 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-T">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luminaire GWP Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Application Structure Plan: A two-tab single-page application. 
-         'DATA' tab for all inputs. 
-         'RESULTS' tab for charts.
-         User flow: Input data -> Calculate -> View charts. -->
-    <!-- Visualization & Content Choices: 
-         - Charts: Stacked bar charts for GWP components. Stage A & EOL GWP correctly includes replacements. -->
+    <title>Luminaire GWP & Cost Assessment Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
     <style>
-        body { font-family: 'Noto Sans', sans-serif; }
-        .tab-button { 
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; 
-            border-bottom: 2px solid transparent;
-            padding-bottom: calc(0.75rem - 2px); /* Adjust padding to account for border */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Noto Sans', sans-serif; 
+            background: #ffffff; 
+            color: #333333; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
         }
-        .tab-button.active { 
-            border-bottom-color: black; 
-            color: black; 
-            font-weight: 500;
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 40px; 
+            font-size: 2.5rem; 
+            color: #1a1a1a;
+            font-weight: 700;
         }
-        .tab-button:not(.active) { color: #4b5563; } /* gray-600 for inactive tab text */
-        .tab-button:not(.active):hover { 
-            border-bottom-color: #d1d5db; /* gray-300 for hover */
-            color: black;
+        .tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 30px; 
+            background: #f5f5f5; 
+            padding: 10px; 
+            border-radius: 15px; 
         }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 700px; /* Max width for the container */
-            margin-left: auto;
-            margin-right: auto;
+        .tab { 
+            flex: 1; 
+            padding: 12px 24px; 
+            background: #ffffff; 
+            border: 1px solid #e0e0e0; 
+            color: #333333; 
+            cursor: pointer; 
+            border-radius: 10px; 
+            font-size: 1rem; 
+            font-weight: 600;
+            transition: all 0.3s ease; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .tab:hover { 
+            background: #f0f0f0;
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
+        }
+        .tab.active { 
+            background: #2c3e50; 
+            color: #ffffff; 
+            font-weight: 600; 
+            border-color: #2c3e50;
+        }
+        .tab-content { display: none; animation: fadeIn 0.5s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { 
+            background: #ffffff; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 15px; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
+        }
+        .section h2 { 
+            color: #2c3e50; 
+            margin-bottom: 20px; 
+            font-size: 1.5rem; 
+            font-weight: 600;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .input-group { margin-bottom: 15px; }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #666666; 
+            font-size: 0.9rem; 
+            font-weight: 600;
+        }
+        input[type="number"], input[type="text"], select { 
+            width: 100%; 
+            padding: 10px; 
+            background: #f8f8f8; 
+            border: 1px solid #d0d0d0; 
+            border-radius: 8px; 
+            color: #333333; 
+            font-size: 1rem; 
+            font-family: 'Noto Sans', sans-serif;
+            transition: all 0.3s ease; 
+        }
+        input[type="number"]:focus, input[type="text"]:focus, select:focus { 
+            outline: none; 
+            border-color: #2c3e50; 
+            background: #ffffff;
+            box-shadow: 0 0 5px rgba(44, 62, 80, 0.2); 
+        }
+        .button { 
+            background: #2c3e50; 
+            color: #ffffff; 
+            border: none; 
+            padding: 12px 30px; 
+            border-radius: 25px; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            font-family: 'Noto Sans', sans-serif;
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2); 
+        }
+        .button:hover { 
+            background: #1a252f;
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(44, 62, 80, 0.3); 
+        }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .result-card { 
+            background: #f8f8f8; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 12px; 
+            padding: 20px; 
+            text-align: center; 
+            transition: all 0.3s ease; 
+        }
+        .result-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); 
+        }
+        .result-card h3 { 
+            color: #2c3e50; 
+            margin-bottom: 15px; 
+            font-size: 1.1rem; 
+            font-weight: 600;
+        }
+        .result-value { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            color: #27ae60; 
+            margin-bottom: 5px; 
+        }
+        .result-unit { 
+            color: #666666; 
+            font-size: 0.9rem; 
+        }
+        .comparison-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        .comparison-table th, .comparison-table td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #e0e0e0; 
+        }
+        .comparison-table th { 
+            background: #f5f5f5; 
+            color: #2c3e50; 
+            font-weight: 600; 
+        }
+        .comparison-table tr:hover { 
+            background: #f8f8f8; 
+        }
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        .chart-container { 
+            position: relative; 
             height: 400px; 
-            max-height: 450px; /* Max height for the container */
-            padding: 1rem;
-            background-color: white;
-            border-radius: 0.25rem; /* Slightly less rounded */
-            border: 1px solid #e5e7eb; /* gray-200 border */
+            margin: 20px 0; 
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
         }
-        @media (min-width: 768px) { 
-            .chart-container { height: 450px; }
+        .loading { 
+            display: inline-block; 
+            width: 20px; 
+            height: 20px; 
+            border: 3px solid rgba(44, 62, 80, 0.3); 
+            border-radius: 50%; 
+            border-top-color: #2c3e50; 
+            animation: spin 1s ease-in-out infinite; 
         }
-        @media (max-width: 639px) { 
-            .chart-container { height: 350px; } /* Adjust height for smaller screens */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Additional styles for better readability */
+        p {
+            color: #666666;
+            line-height: 1.6;
         }
-        input[type="number"] {
-            -moz-appearance: textfield;
+        
+        strong {
+            color: #333333;
         }
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .form-input {
-            border: 1px solid #d1d5db; /* gray-300 */
-            border-radius: 0.25rem;
-            box-shadow: none;
-        }
-        .form-input:focus {
-            border-color: #6b7280; /* gray-500 */
-            box-shadow: 0 0 0 1px #6b7280;
-            outline: none;
-        }
-        .simple-section {
-            border: 1px solid #e5e7eb; /* gray-200 */
-            border-radius: 0.25rem;
+        
+        /* Update readonly input style */
+        input[readonly] {
+            background: #f0f0f0 !important;
+            cursor: not-allowed;
+            color: #666666;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-black min-h-screen flex flex-col">
-
-    <header class="bg-white py-6 border-b border-gray-200">
-        <h1 class="text-3xl font-bold text-center text-black">LUMINAIRE GWP CALCULATOR AND COMPARISON TOOL</h1>
-        <p class="text-xs text-gray-600 text-center mt-1">Developed by Dimitrios Tsiokaras - dimitrios@electrolight.com</p>
-    </header>
-
-    <main class="container mx-auto px-4 py-8 flex-grow">
-        <div class="bg-white p-6 rounded-md border border-gray-200">
-            <div class="mb-6 border-b border-gray-300">
-                <nav class="flex space-x-2" aria-label="Tabs">
-                    <button id="tab-data-btn" type="button" class="tab-button active px-4 py-3 font-medium text-sm focus:outline-none">
-                        DATA
-                    </button>
-                    <button id="tab-results-btn" type="button" class="tab-button px-4 py-3 font-medium text-sm focus:outline-none">
-                        RESULTS
-                    </button>
-                </nav>
-            </div>
-
-            <div id="tab-data-content">
-                <p class="text-gray-600 mb-6 text-sm">
-                    Enter the project-specific parameters and the technical data for up to three luminaires you wish to compare. All fields are required for accurate GWP calculations. Once data is entered, click "Calculate & View Results".
+<body>
+    <!-- Welcome Modal -->
+    <div id="welcomeModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s ease;">
+        <div style="background-color: #ffffff; margin: 5% auto; padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; animation: slideIn 0.3s ease;">
+            <button onclick="closeWelcomeModal()" style="position: absolute; right: 20px; top: 20px; background: none; border: none; font-size: 24px; color: #999; cursor: pointer; padding: 0; width: 30px; height: 30px; line-height: 30px;">&times;</button>
+            
+            <h2 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.8rem;">Welcome to the Luminaire GWP & Cost Assessment Tool</h2>
+            
+            <div style="color: #333333; line-height: 1.6;">
+                <p style="margin-bottom: 15px;">
+                    This tool helps lighting professionals evaluate the environmental and financial impacts of different luminaire options over their lifecycle, comparing Global Warming Potential (GWP) and total costs.
                 </p>
-                <form id="gwpForm">
-                    <section id="projectParams" class="mb-8 p-6 bg-gray-50 simple-section">
-                        <h2 class="text-xl font-semibold text-black mb-4">Project Parameters</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div>
-                                <label for="co2GridFactor" class="block text-sm font-medium text-black mb-1">CO2e Grid Factor (kg/kWh)</label>
-                                <input type="number" id="co2GridFactor" value="0.233" step="0.001" class="form-input w-full p-2">
-                            </div>
-                            <div>
-                                <label for="controlSystemCoefficient" class="block text-sm font-medium text-black mb-1">Control System Savings (%)</label>
-                                <input type="number" id="controlSystemCoefficient" value="30" step="1" min="0" max="100" class="form-input w-full p-2">
-                            </div>
-                            <div>
-                                <label for="operationalHoursYear" class="block text-sm font-medium text-black mb-1">Operational Hours/Year</label>
-                                <input type="number" id="operationalHoursYear" value="3000" step="100" class="form-input w-full p-2">
-                            </div>
-                            <div>
-                                <label for="anticipatedProjectLife" class="block text-sm font-medium text-black mb-1">Anticipated Project Life (years)</label>
-                                <input type="number" id="anticipatedProjectLife" value="10" step="1" class="form-input w-full p-2">
-                            </div>
-                            <div>
-                                <label for="maintenanceDimmingSavings" class="block text-sm font-medium text-black mb-1">Maintenance Dimming Savings (%)</label>
-                                <input type="number" id="maintenanceDimmingSavings" value="10" step="1" min="0" max="100" class="form-input w-full p-2" title="Additional savings on operational energy after control system savings are applied.">
-                            </div>
-                            <div>
-                                <label for="maintenanceFactorL70" class="block text-sm font-medium text-black mb-1">Maintenance Factor L70</label>
-                                <input type="number" id="maintenanceFactorL70" value="0.70" step="0.01" min="0.01" max="1" class="form-input w-full p-2" title="E.g., 0.70. Applied to adjust operational GWP for L70 calculations.">
-                            </div>
-                            <div>
-                                <label for="maintenanceFactorL90" class="block text-sm font-medium text-black mb-1">Maintenance Factor L90</label>
-                                <input type="number" id="maintenanceFactorL90" value="0.90" step="0.01" min="0.01" max="1" class="form-input w-full p-2" title="E.g., 0.90. Applied to adjust operational GWP for L90 calculations.">
-                            </div>
-                        </div>
-                    </section>
-
-                    <div id="luminairesGridContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        </div>
-
-                    <div class="mt-8 text-center">
-                        <button type="submit" class="bg-black hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-md border border-black focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition duration-150 ease-in-out">
-                            Calculate & View Results
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="tab-results-content" class="hidden">
-                <p class="text-gray-600 mb-6 text-sm">
-                    The charts below illustrate the Global Warming Potential (GWP) comparisons for the entered luminaires, broken down by lifecycle stage. Operational GWP (Stage B) is adjusted by the specified maintenance factors. Manufacturing (Stage A) and End-of-Life (EOL) GWP include replacements. Lower bars indicate a lower environmental impact.
+                
+                <h3 style="color: #2c3e50; font-size: 1.2rem; margin-bottom: 10px; margin-top: 20px;">Key Features:</h3>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li style="margin-bottom: 8px;"><strong>L70 vs L90 Comparison:</strong> Compare different lifetime maintenance factors and their impact on GWP</li>
+                    <li style="margin-bottom: 8px;"><strong>GWP Analysis:</strong> Evaluate carbon footprint across manufacturing, operations, and end-of-life stages</li>
+                    <li style="margin-bottom: 8px;"><strong>Financial Analysis:</strong> Calculate total cost of ownership including energy, replacements, and controls</li>
+                    <li style="margin-bottom: 8px;"><strong>Control System Impact:</strong> See how lighting controls and maintenance dimming reduce both GWP and costs</li>
+                </ul>
+                
+                <h3 style="color: #2c3e50; font-size: 1.2rem; margin-bottom: 10px;">How to Use:</h3>
+                <ol style="margin-left: 20px; margin-bottom: 15px;">
+                    <li style="margin-bottom: 8px;">Enter your market data (electricity rates, grid emissions factor)</li>
+                    <li style="margin-bottom: 8px;">Input specifications for your baseline (A) and proposed (B) luminaires</li>
+                    <li style="margin-bottom: 8px;">Click "Calculate Analysis" to generate comprehensive results</li>
+                    <li style="margin-bottom: 8px;">Navigate between tabs to explore different aspects of the comparison</li>
+                </ol>
+                
+                <p style="margin-top: 20px; font-style: italic; color: #666666; font-size: 0.9rem;">
+                    Note: The tool automatically adjusts quantities based on maintenance factors (L70/L90) to ensure equivalent light output throughout the project lifetime.
                 </p>
-                <div class="space-y-8">
-                    <div>
-                        <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP L90 vs L70 Comparison</h3>
-                        <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire when considering L70 lifetime versus L90 lifetime. Stage B GWP is adjusted by L70 and L90 maintenance factors respectively.</p>
-                        <div class="chart-container">
-                            <canvas id="gwpL70L90Chart"></canvas>
-                        </div>
+            </div>
+            
+            <button onclick="closeWelcomeModal()" class="button" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto;">
+                Get Started
+            </button>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+    
+    <script>
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').style.display = 'none';
+        }
+        
+        // Show modal on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('welcomeModal').style.display = 'block';
+        });
+    </script>
+    
+    <div class="container">
+        <h1>Luminaire GWP & Cost Assessment Tool</h1>
+        <p style="text-align: center; color: #666666; font-size: 0.9rem; margin-top: -20px; margin-bottom: 30px;">
+            Developed by Dimitrios Tsiokaras - <a href="mailto:dimitrios@electrolight.com" style="color: #2c3e50;">dimitrios@electrolight.com</a>
+        </p>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="window.showTab('input', event)">Data Entry</button>
+            <button class="tab" onclick="window.showTab('l70vsl90', event)">L70 vs L90 Comparison</button>
+            <button class="tab" onclick="window.showTab('gwp', event)">GWP Analysis (L90)</button>
+            <button class="tab" onclick="window.showTab('financial', event)">Financial Analysis (L90)</button>
+        </div>
+        
+        <!-- Data Entry Tab -->
+        <div id="input" class="tab-content active">
+            <div class="section">
+                <h2>Market Data</h2>
+                <div class="grid">
+                    <div class="input-group">
+                        <label>CO2e Grid Factor (kg/kWh)</label>
+                        <input type="number" id="gridFactor" value="0.39" step="0.01">
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP Comparison With Control (L90 Baseline)</h3>
-                        <p class="text-sm text-gray-600 mb-3 text-center">Shows GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF), comparing baseline operation versus operation with control system savings.</p>
-                        <div class="chart-container">
-                            <canvas id="gwpControlChart"></canvas>
-                        </div>
+                    <div class="input-group">
+                        <label>Current Electricity Rate ($/kWh)</label>
+                        <input type="number" id="electricityRate" value="0.26" step="0.01">
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-black mb-2 text-center">GWP With Control & Maintenance Dimming (L90 Baseline)</h3>
-                        <p class="text-sm text-gray-600 mb-3 text-center">Compares GWP components (kgCO2e) for each luminaire (L90 lifetime, Stage B adjusted by L90 MF): with control system savings versus with both control system and maintenance dimming savings applied.</p>
-                        <div class="chart-container">
-                            <canvas id="gwpMaintenanceDimmingChart"></canvas>
-                        </div>
+                    <div class="input-group">
+                        <label>Average Inflation Rate</label>
+                        <input type="number" id="inflationRate" value="0.03" step="0.01">
                     </div>
                 </div>
-                 <div class="mt-8 text-center">
-                    <button id="backToDataBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 transition duration-150 ease-in-out mr-4">
-                        Back to Data
-                    </button>
+            </div>
+            
+            <div class="section">
+                <h2>Project Data</h2>
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Control System Coefficient</label>
+                        <input type="number" id="controlCoeff" value="0.75" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>Control Additional Cost Coefficient</label>
+                        <input type="number" id="controlCostCoeff" value="1.15" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>Operational Hours/Year</label>
+                        <input type="number" id="operationalHours" value="4990" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Anticipated Project Life (years)</label>
+                        <input type="number" id="projectLife" value="15" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label>L90 Luminaire Maintenance Factor</label>
+                        <input type="number" id="l90Factor" value="0.9" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>L70 Luminaire Maintenance Factor</label>
+                        <input type="number" id="l70Factor" value="0.7" step="0.01">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Baseline Luminaire (A)</h2>
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Wattage (W)</label>
+                        <input type="number" id="baselineWattage" value="12" step="0.1" onchange="window.updateEfficacy('baseline')">
+                    </div>
+                    <div class="input-group">
+                        <label>Flux Lumens (lm)</label>
+                        <input type="number" id="baselineFlux" value="1000" step="1" onchange="window.updateEfficacy('baseline')">
+                    </div>
+                    <div class="input-group">
+                        <label>Efficacy (lm/W)</label>
+                        <input type="number" id="baselineEfficacy" value="83.3" step="0.1" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>Quantity</label>
+                        <input type="number" id="baselineQty" value="500" step="0.001">
+                    </div>
+                    <div class="input-group">
+                        <label>L90 Lifetime (hours)</label>
+                        <input type="number" id="baselineL90Lifetime" value="50000" step="1000">
+                    </div>
+                    <div class="input-group">
+                        <label>L70 Lifetime (hours)</label>
+                        <input type="number" id="baselineL70Lifetime" value="120000" step="1000">
+                    </div>
+                    <div class="input-group">
+                        <label>GWP - Cradle to Gate (kgCO2e)</label>
+                        <input type="number" id="baselineGWP" value="10" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>GWP - End of Life (kgCO2e)</label>
+                        <input type="number" id="baselineEOL" value="0.5" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>Supply + Install Cost ($)</label>
+                        <input type="number" id="baselineCost" value="260" step="1">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Proposed Luminaire (B)</h2>
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Wattage (W)</label>
+                        <input type="number" id="proposedWattage" value="9" step="0.1" onchange="window.updateEfficacy('proposed')">
+                    </div>
+                    <div class="input-group">
+                        <label>Flux Lumens (lm)</label>
+                        <input type="number" id="proposedFlux" value="1059" step="1" onchange="window.updateEfficacy('proposed')">
+                    </div>
+                    <div class="input-group">
+                        <label>Efficacy (lm/W)</label>
+                        <input type="number" id="proposedEfficacy" value="117.7" step="0.1" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label>Quantity</label>
+                        <input type="number" id="proposedQty" value="473.48" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>L90 Lifetime (hours)</label>
+                        <input type="number" id="proposedL90Lifetime" value="45000" step="1000">
+                    </div>
+                    <div class="input-group">
+                        <label>L70 Lifetime (hours)</label>
+                        <input type="number" id="proposedL70Lifetime" value="100000" step="1000">
+                    </div>
+                    <div class="input-group">
+                        <label>GWP - Cradle to Gate (kgCO2e)</label>
+                        <input type="number" id="proposedGWP" value="20" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>GWP - End of Life (kgCO2e)</label>
+                        <input type="number" id="proposedEOL" value="1.5" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label>Supply + Install Cost ($)</label>
+                        <input type="number" id="proposedCost" value="220" step="1">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="button" onclick="window.calculateAll()">Calculate Analysis</button>
+        </div>
+        
+        <!-- L70 vs L90 Comparison Tab -->
+        <div id="l70vsl90" class="tab-content">
+            <div class="section">
+                <h2>GWP L90 vs L70 Comparison</h2>
+                <p>Compares GWP components (kgCO2e) for each luminaire when considering L70 lifetime versus L90 lifetime. Quantities are adjusted based on maintenance factors (÷0.9 for L90, ÷0.7 for L70) to maintain equivalent light output. Replacements are calculated based on respective lifetimes.</p>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="l70vsl90Chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Environmental Impact Summary</h2>
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #c8e6c9;">
+                    <p style="color: #2e7d32; margin: 0;">
+                        <strong>Key Finding:</strong> L90 fixtures require fewer total units (due to 0.9 maintenance factor) but need more frequent replacements due to shorter lifetime. L70 fixtures require more units initially (due to 0.7 maintenance factor) but last longer.
+                    </p>
+                </div>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Luminaire A - Total GWP</h3>
+                        <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+                            <div>
+                                <div style="color: #666666; font-size: 0.9rem;">L90</div>
+                                <div class="result-value" id="gwpTotalA_L90" style="font-size: 1.5rem;">-</div>
+                            </div>
+                            <div>
+                                <div style="color: #666666; font-size: 0.9rem;">L70</div>
+                                <div class="result-value" id="gwpTotalA_L70" style="font-size: 1.5rem;">-</div>
+                            </div>
+                            <div>
+                                <div style="color: #666666; font-size: 0.9rem;">Difference</div>
+                                <div class="result-value" id="gwpDiffA" style="font-size: 1.5rem;">-</div>
+                            </div>
+                        </div>
+                        <div class="result-unit">kgCO2e</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Luminaire B - Total GWP</h3>
+                        <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+                            <div>
+                                <div style="color: #666666; font-size: 0.9rem;">L90</div>
+                                <div class="result-value" id="gwpTotalB_L90" style="font-size: 1.5rem;">-</div>
+                            </div>
+                            <div>
+                                <div style="color: #666666; font-size: 0.9rem;">L70</div>
+                                <div class="result-value" id="gwpTotalB_L70" style="font-size: 1.5rem;">-</div>
+                            </div>
+                            <div>
+                                <div style="color: #666666; font-size: 0.9rem;">Difference</div>
+                                <div class="result-value" id="gwpDiffB" style="font-size: 1.5rem;">-</div>
+                            </div>
+                        </div>
+                        <div class="result-unit">kgCO2e</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Component Breakdown</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Luminaire (Adjusted Qty)</th>
+                            <th>Lifetime (Replacements)</th>
+                            <th>Manufacturing (A)</th>
+                            <th>Operations (B)</th>
+                            <th>End of Life (C)</th>
+                            <th>Total GWP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gwpComponentTable">
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Calculate to see results</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- GWP Analysis Tab -->
+        <div id="gwp" class="tab-content">
+            <div class="section">
+                <h2>GWP Lifecycle Analysis (L90 Baseline)</h2>
+                <p>Environmental impact using L90 lifetime with quantities adjusted by ÷0.9 maintenance factor. This ensures equivalent light output throughout the project life. The chart shows how different control strategies progressively reduce GWP across all lifecycle stages.</p>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="gwpChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Environmental Impact Summary</h2>
+                
+                <div class="results-grid" style="margin-bottom: 30px;">
+                    <div class="result-card">
+                        <h3>Overall GWP Reduction</h3>
+                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">Proposed vs Baseline (No Controls)</div>
+                        <div class="result-value" id="gwpReduction">-</div>
+                        <div class="result-unit">% reduction</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Maximum GWP Reduction</h3>
+                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">With All Control Strategies</div>
+                        <div class="result-value" id="gwpMaxReduction">-</div>
+                        <div class="result-unit">% reduction</div>
+                    </div>
+                </div>
+                
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">Progressive Impact Analysis</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Control Strategy</th>
+                            <th>Baseline A (kgCO2e)</th>
+                            <th>Proposed B (kgCO2e)</th>
+                            <th>A → B Reduction</th>
+                            <th>Stage B Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gwpScenarioTable">
+                        <tr>
+                            <td>Without Control</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>With Control System</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>With Control + Maintenance Dimming</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 8px; border: 1px solid #e0e0e0;">
+                    <p style="font-size: 0.9rem; margin: 0;">
+                        <strong>Note:</strong> Stage A (Manufacturing) and Stage C (End of Life) emissions remain constant across control strategies. Stage B (Operations) emissions are progressively reduced through control systems and maintenance dimming, demonstrating the importance of operational efficiency in lifecycle carbon reduction.
+                    </p>
                 </div>
             </div>
         </div>
-    </main>
-
-    <footer class="text-center py-4 bg-gray-100 border-t border-gray-200 mt-auto">
-        <p class="text-xs text-gray-500">Luminaire GWP Calculator v1.0</p>
-    </footer>
-
-    <script>
-        const tabDataBtn = document.getElementById('tab-data-btn');
-        const tabResultsBtn = document.getElementById('tab-results-btn');
-        const tabDataContent = document.getElementById('tab-data-content');
-        const tabResultsContent = document.getElementById('tab-results-content');
-        const gwpForm = document.getElementById('gwpForm');
-        const backToDataBtn = document.getElementById('backToDataBtn');
-        const luminairesGridContainer = document.getElementById('luminairesGridContainer');
-
-        let gwpL70L90ChartInstance, gwpControlChartInstance, gwpMaintenanceDimmingChartInstance;
-        let currentLuminairesDataStorage = []; 
-
-        // Define primary and secondary color sets for chart bars
-        const stageColorsPrimary = {
-            op: '#3b82f6',    // blue-500 (Operational Stage B)
-            mfg: '#f97316',   // orange-500 (Manufacturing Stage A)
-            eol: '#6b7280'    // gray-500 (EOL Stage EOL)
-        };
-        const stageColorsSecondary = { // Lighter versions for comparison
-            op: '#60a5fa',    // blue-400
-            mfg: '#fb923c',   // orange-400
-            eol: '#9ca3af'    // gray-400
-        };
         
-        Chart.defaults.font.family = 'Noto Sans'; // Set default font for all charts
-
-        const commonChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false, 
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    stacked: true,
-                    ticks: { color: '#000000', font: { family: 'Noto Sans'} }, 
-                    grid: { color: '#e5e7eb' }, 
-                    title: { display: true, text: 'GWP (kgCO2e)', color: '#000000', font: { family: 'Noto Sans', weight: '500'}} 
-                },
-                x: {
-                    stacked: true,
-                    ticks: { 
-                        color: '#000000', maxRotation: 0, minRotation: 0, autoSkip: false, font: { family: 'Noto Sans'},
-                        callback: function(value) {
-                            const label = this.getLabelForValue(value);
-                            return label.length > 16 ? label.substring(0, 15) + '...' : label;
-                        }
-                    },
-                    grid: { display: false }
+        <!-- Financial Analysis Tab -->
+        <div id="financial" class="tab-content">
+            <div class="section">
+                <h2>Total Cost Analysis (L90 Baseline)</h2>
+                <p>Financial analysis using L90 lifetime with quantities adjusted by ÷0.9 maintenance factor to ensure equivalent light output. Uses the same L90 calculations for fixtures and replacements as shown in the GWP Analysis. The chart shows total project costs including initial investment, replacements based on L90 lifetime, and operational expenses over the project lifetime.</p>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Financial Impact Summary</h2>
+                
+                <div class="results-grid" style="margin-bottom: 30px;">
+                    <div class="result-card">
+                        <h3>Baseline Cost Savings</h3>
+                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">Proposed vs Baseline (No Controls)</div>
+                        <div class="result-value" id="costSavings">-</div>
+                        <div class="result-unit">% savings</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Maximum Cost Savings</h3>
+                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">With All Control Strategies</div>
+                        <div class="result-value" id="maxCostSavings">-</div>
+                        <div class="result-unit">% savings</div>
+                    </div>
+                </div>
+                
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">Progressive Financial Analysis</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Control Strategy</th>
+                            <th>Baseline A ($)</th>
+                            <th>Proposed B ($)</th>
+                            <th>A → B Savings</th>
+                            <th>Annual Op. Savings</th>
+                        </tr>
+                    </thead>
+                    <tbody id="financialScenarioTable">
+                        <tr>
+                            <td>Without Control</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>With Control System</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>With Control + Maintenance Dimming</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/javascript">(function() {
+        var l70vsl90ChartInstance = null;
+        var gwpChartInstance = null;
+        var financialChartInstance = null;
+        
+        function formatNumber(num, decimals) {
+            if (typeof decimals === 'undefined') decimals = 0;
+            if (typeof num !== 'number') {
+                num = parseFloat(num) || 0;
+            }
+            return num.toLocaleString('en-US', { 
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals 
+            });
+        }
+        
+        function updateEfficacy(type) {
+            try {
+                var wattage = parseFloat(document.getElementById(type + 'Wattage').value) || 0;
+                var flux = parseFloat(document.getElementById(type + 'Flux').value) || 0;
+                var efficacy = wattage > 0 ? (flux / wattage).toFixed(1) : '0';
+                var efficacyInput = document.getElementById(type + 'Efficacy');
+                if (efficacyInput) {
+                    efficacyInput.value = efficacy;
                 }
-            },
-            plugins: {
-                legend: {
-                    display: false // Remove the legend (key)
-                },
-                tooltip: {
-                    mode: 'point', // Tooltip will appear for the specific bar segment hovered
-                    intersect: true, // Tooltip will only appear if the mouse intersects a bar segment
-                    backgroundColor: 'rgba(0,0,0,0.85)', 
-                    titleColor: 'white', 
-                    bodyColor: 'white', 
-                    titleFont: { family: 'Noto Sans', weight: '500' },
-                    bodyFont: { family: 'Noto Sans' },
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || ''; // Full label e.g., "Operational (B) - L70"
-                            if (label) label = label + ': '; 
-                            if (context.parsed.y !== null) label += context.parsed.y.toFixed(2) + ' kgCO2e';
-                            return label;
+            } catch (error) {
+                console.error('Error updating efficacy:', error);
+            }
+        }
+        
+        function showTab(tabName, event) {
+            try {
+                var tabs = document.querySelectorAll('.tab-content');
+                tabs.forEach(function(tab) { tab.classList.remove('active'); });
+                
+                var buttons = document.querySelectorAll('.tab');
+                buttons.forEach(function(btn) { btn.classList.remove('active'); });
+                
+                var selectedTab = document.getElementById(tabName);
+                if (selectedTab) {
+                    selectedTab.classList.add('active');
+                }
+                
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                } else {
+                    buttons.forEach(function(btn) {
+                        if (btn.textContent.toLowerCase().includes(tabName.toLowerCase()) || 
+                            (tabName === 'input' && btn.textContent === 'Data Entry') ||
+                            (tabName === 'l70vsl90' && btn.textContent.includes('L70 vs L90')) ||
+                            (tabName === 'gwp' && btn.textContent.includes('GWP Analysis')) ||
+                            (tabName === 'financial' && btn.textContent.includes('Financial Analysis'))) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+                
+                setTimeout(function() {
+                    if (tabName === 'l70vsl90' && l70vsl90ChartInstance) {
+                        l70vsl90ChartInstance.resize();
+                    } else if (tabName === 'gwp' && gwpChartInstance) {
+                        gwpChartInstance.resize();
+                    } else if (tabName === 'financial' && financialChartInstance) {
+                        financialChartInstance.resize();
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error showing tab:', error);
+            }
+        }
+        
+        function calculateAll() {
+            try {
+                var inputs = {
+                    gridFactor: parseFloat(document.getElementById('gridFactor').value) || 0.39,
+                    electricityRate: parseFloat(document.getElementById('electricityRate').value) || 0.26,
+                    inflationRate: parseFloat(document.getElementById('inflationRate').value) || 0.03,
+                    controlCoeff: parseFloat(document.getElementById('controlCoeff').value) || 0.75,
+                    controlCostCoeff: parseFloat(document.getElementById('controlCostCoeff').value) || 1.15,
+                    operationalHours: parseFloat(document.getElementById('operationalHours').value) || 4990,
+                    projectLife: parseFloat(document.getElementById('projectLife').value) || 15,
+                    l90Factor: parseFloat(document.getElementById('l90Factor').value) || 0.9,
+                    l70Factor: parseFloat(document.getElementById('l70Factor').value) || 0.7,
+                    
+                    baseline: {
+                        wattage: parseFloat(document.getElementById('baselineWattage').value) || 12,
+                        flux: parseFloat(document.getElementById('baselineFlux').value) || 1000,
+                        qty: parseFloat(document.getElementById('baselineQty').value) || 500,
+                        l90Lifetime: parseFloat(document.getElementById('baselineL90Lifetime').value) || 50000,
+                        l70Lifetime: parseFloat(document.getElementById('baselineL70Lifetime').value) || 120000,
+                        gwp: parseFloat(document.getElementById('baselineGWP').value) || 10,
+                        eol: parseFloat(document.getElementById('baselineEOL').value) || 0.5,
+                        cost: parseFloat(document.getElementById('baselineCost').value) || 260
+                    },
+                    
+                    proposed: {
+                        wattage: parseFloat(document.getElementById('proposedWattage').value) || 9,
+                        flux: parseFloat(document.getElementById('proposedFlux').value) || 1059,
+                        qty: parseFloat(document.getElementById('proposedQty').value) || 473.48,
+                        l90Lifetime: parseFloat(document.getElementById('proposedL90Lifetime').value) || 45000,
+                        l70Lifetime: parseFloat(document.getElementById('proposedL70Lifetime').value) || 100000,
+                        gwp: parseFloat(document.getElementById('proposedGWP').value) || 20,
+                        eol: parseFloat(document.getElementById('proposedEOL').value) || 1.5,
+                        cost: parseFloat(document.getElementById('proposedCost').value) || 220
+                    }
+                };
+                
+                var scenarios = ['without', 'with', 'withMaintenance'];
+                var resultsL90 = {};
+                var resultsL70 = {};
+                
+                var adjustedBaselineL90 = {};
+                for (var key in inputs.baseline) {
+                    adjustedBaselineL90[key] = inputs.baseline[key];
+                }
+                adjustedBaselineL90.qty = inputs.baseline.qty / inputs.l90Factor;
+                
+                var adjustedProposedL90 = {};
+                for (var key in inputs.proposed) {
+                    adjustedProposedL90[key] = inputs.proposed[key];
+                }
+                adjustedProposedL90.qty = inputs.proposed.qty / inputs.l90Factor;
+                
+                scenarios.forEach(function(scenario) {
+                    resultsL90[scenario] = {
+                        baseline: calculateLuminaire(inputs, adjustedBaselineL90, scenario, 'L90'),
+                        proposed: calculateLuminaire(inputs, adjustedProposedL90, scenario, 'L90')
+                    };
+                    resultsL70[scenario] = {
+                        baseline: calculateLuminaire(inputs, inputs.baseline, scenario, 'L70'),
+                        proposed: calculateLuminaire(inputs, inputs.proposed, scenario, 'L70')
+                    };
+                });
+                
+                updateGWPResults(resultsL90, inputs, adjustedBaselineL90.qty, adjustedProposedL90.qty);
+                updateFinancialResults(resultsL90, inputs, adjustedBaselineL90.qty, adjustedProposedL90.qty);
+                updateL70vsL90Comparison(resultsL90, resultsL70, inputs);
+                
+            } catch (error) {
+                console.error('Error in calculateAll:', error);
+                alert('An error occurred during calculation. Please check your inputs.');
+            }
+        }
+        
+        function calculateLuminaire(inputs, luminaire, scenario, lifetimeType) {
+            try {
+                var energyMultiplier = 1;
+                var costMultiplier = 1;
+                var maintenanceMultiplier = 1;
+                
+                if (scenario === 'with' || scenario === 'withMaintenance') {
+                    energyMultiplier = inputs.controlCoeff;
+                    costMultiplier = inputs.controlCostCoeff;
+                }
+                
+                if (scenario === 'withMaintenance') {
+                    var maintenanceFactor = lifetimeType === 'L90' ? inputs.l90Factor : inputs.l70Factor;
+                    maintenanceMultiplier = maintenanceFactor;
+                }
+                
+                var lifetime = lifetimeType === 'L90' ? luminaire.l90Lifetime : luminaire.l70Lifetime;
+                var lifetimeYears = inputs.operationalHours > 0 ? lifetime / inputs.operationalHours : 0;
+                
+                var replacements = lifetimeYears > 0 ? Math.max(0, Math.ceil(inputs.projectLife / lifetimeYears) - 1) : 0;
+                
+                var annualEnergy = luminaire.wattage * luminaire.qty * inputs.operationalHours * energyMultiplier * maintenanceMultiplier / 1000;
+                
+                var totalEnergy = annualEnergy * inputs.projectLife;
+                
+                var operationalGWP = totalEnergy * inputs.gridFactor;
+                var embodiedGWP = luminaire.gwp * luminaire.qty * (1 + replacements);
+                var eolGWP = luminaire.eol * luminaire.qty * (1 + replacements);
+                var totalGWP = operationalGWP + embodiedGWP + eolGWP;
+                
+                var initialCost = luminaire.cost * luminaire.qty * costMultiplier;
+                var replacementCost = luminaire.cost * luminaire.qty * replacements * costMultiplier;
+                var annualOperatingCost = annualEnergy * inputs.electricityRate;
+                
+                var totalOperatingCost = 0;
+                for (var year = 0; year < inputs.projectLife; year++) {
+                    totalOperatingCost += annualOperatingCost * Math.pow(1 + inputs.inflationRate, year);
+                }
+                
+                var totalCost = initialCost + replacementCost + totalOperatingCost;
+                
+                return {
+                    annualEnergy: annualEnergy,
+                    totalEnergy: totalEnergy,
+                    totalGWP: totalGWP,
+                    initialCost: initialCost,
+                    replacementCost: replacementCost,
+                    annualOperatingCost: annualOperatingCost,
+                    totalOperatingCost: totalOperatingCost,
+                    totalCost: totalCost,
+                    operationalGWP: operationalGWP,
+                    embodiedGWP: embodiedGWP,
+                    eolGWP: eolGWP,
+                    lifetimeYears: lifetimeYears,
+                    replacements: replacements
+                };
+            } catch (error) {
+                console.error('Error in calculateLuminaire:', error);
+                return {
+                    annualEnergy: 0,
+                    totalEnergy: 0,
+                    totalGWP: 0,
+                    initialCost: 0,
+                    replacementCost: 0,
+                    annualOperatingCost: 0,
+                    totalOperatingCost: 0,
+                    totalCost: 0,
+                    operationalGWP: 0,
+                    embodiedGWP: 0,
+                    eolGWP: 0,
+                    lifetimeYears: 0,
+                    replacements: 0
+                };
+            }
+        }
+        
+        function updateGWPResults(results, inputs, adjustedBaselineQty, adjustedProposedQty) {
+            try {
+                var baselineGWP = results.without.baseline.totalGWP;
+                var proposedGWP = results.without.proposed.totalGWP;
+                var gwpReduction = baselineGWP > 0 ? ((baselineGWP - proposedGWP) / baselineGWP * 100).toFixed(1) : '0';
+                
+                var baselineGWPMax = results.withMaintenance.baseline.totalGWP;
+                var proposedGWPMax = results.withMaintenance.proposed.totalGWP;
+                var gwpMaxReduction = baselineGWP > 0 ? ((baselineGWP - proposedGWPMax) / baselineGWP * 100).toFixed(1) : '0';
+                
+                var gwpReductionElement = document.getElementById('gwpReduction');
+                var gwpMaxReductionElement = document.getElementById('gwpMaxReduction');
+                
+                if (gwpReductionElement) {
+                    gwpReductionElement.textContent = gwpReduction;
+                    gwpReductionElement.className = parseFloat(gwpReduction) > 0 ? 'result-value positive' : 'result-value negative';
+                }
+                if (gwpMaxReductionElement) {
+                    gwpMaxReductionElement.textContent = gwpMaxReduction;
+                    gwpMaxReductionElement.className = parseFloat(gwpMaxReduction) > 0 ? 'result-value positive' : 'result-value negative';
+                }
+                
+                var scenarioData = [
+                    ['Without Control', results.without],
+                    ['With Control System', results.with],
+                    ['With Control + Maintenance Dimming', results.withMaintenance]
+                ];
+                
+                var tbody = document.getElementById('gwpScenarioTable');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    
+                    var headerRow = tbody.insertRow();
+                    headerRow.innerHTML = '<td colspan="5" style="text-align: center; color: #27ae60; padding: 10px;">' +
+                        '<strong>Adjusted Quantities:</strong> Baseline A: ' + formatNumber(adjustedBaselineQty, 1) + 
+                        ' units | Proposed B: ' + formatNumber(adjustedProposedQty, 1) + ' units</td>';
+                    
+                    scenarioData.forEach(function(item) {
+                        var name = item[0];
+                        var data = item[1];
+                        var row = tbody.insertRow();
+                        var diff = data.baseline.totalGWP > 0 ? 
+                            ((data.baseline.totalGWP - data.proposed.totalGWP) / data.baseline.totalGWP * 100).toFixed(1) : '0';
+                        
+                        var baselineB = results.without.baseline.operationalGWP;
+                        var currentB = data.baseline.operationalGWP;
+                        var stageBReduction = baselineB > 0 ? ((baselineB - currentB) / baselineB * 100).toFixed(0) : '0';
+                        
+                        row.innerHTML = '<td>' + name + '</td>' +
+                            '<td>' + formatNumber(data.baseline.totalGWP) + '</td>' +
+                            '<td>' + formatNumber(data.proposed.totalGWP) + '</td>' +
+                            '<td class="' + (parseFloat(diff) > 0 ? 'positive' : 'negative') + '">' + diff + '%</td>' +
+                            '<td>' + stageBReduction + '% reduction</td>';
+                    });
+                }
+                
+                createGWPStackedChart(scenarioData, adjustedBaselineQty, adjustedProposedQty);
+            } catch (error) {
+                console.error('Error updating GWP results:', error);
+            }
+        }
+        
+        function updateFinancialResults(results, inputs, adjustedBaselineQty, adjustedProposedQty) {
+            try {
+                var baselineCost = results.without.baseline.totalCost;
+                var proposedCost = results.without.proposed.totalCost;
+                var costSavings = baselineCost > 0 ? ((baselineCost - proposedCost) / baselineCost * 100).toFixed(1) : '0';
+                
+                var baselineCostMax = results.withMaintenance.baseline.totalCost;
+                var proposedCostMax = results.withMaintenance.proposed.totalCost;
+                var maxCostSavings = baselineCost > 0 ? ((baselineCost - proposedCostMax) / baselineCost * 100).toFixed(1) : '0';
+                
+                var costSavingsElement = document.getElementById('costSavings');
+                var maxCostSavingsElement = document.getElementById('maxCostSavings');
+                
+                if (costSavingsElement) {
+                    costSavingsElement.textContent = costSavings;
+                    costSavingsElement.className = parseFloat(costSavings) > 0 ? 'result-value positive' : 'result-value negative';
+                }
+                if (maxCostSavingsElement) {
+                    maxCostSavingsElement.textContent = maxCostSavings;
+                    maxCostSavingsElement.className = parseFloat(maxCostSavings) > 0 ? 'result-value positive' : 'result-value negative';
+                }
+                
+                var scenarioData = [
+                    ['Without Control', results.without],
+                    ['With Control System', results.with],
+                    ['With Control + Maintenance Dimming', results.withMaintenance]
+                ];
+                
+                var tbody = document.getElementById('financialScenarioTable');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    
+                    var headerRow = tbody.insertRow();
+                    headerRow.innerHTML = '<td colspan="5" style="text-align: center; color: #27ae60; padding: 10px;">' +
+                        '<strong>Adjusted Quantities:</strong> Baseline A: ' + formatNumber(adjustedBaselineQty, 1) + 
+                        ' units | Proposed B: ' + formatNumber(adjustedProposedQty, 1) + ' units</td>';
+                    
+                    scenarioData.forEach(function(item, index) {
+                        var name = item[0];
+                        var data = item[1];
+                        var row = tbody.insertRow();
+                        var savings = data.baseline.totalCost > 0 ? 
+                            ((data.baseline.totalCost - data.proposed.totalCost) / data.baseline.totalCost * 100).toFixed(1) : '0';
+                        
+                        var annualOpSavings = '$' + formatNumber(data.baseline.annualOperatingCost - data.proposed.annualOperatingCost);
+                        
+                        row.innerHTML = '<td>' + name + '</td>' +
+                            '<td>$' + formatNumber(data.baseline.totalCost) + '</td>' +
+                            '<td>$' + formatNumber(data.proposed.totalCost) + '</td>' +
+                            '<td class="' + (parseFloat(savings) > 0 ? 'positive' : 'negative') + '">' + savings + '%</td>' +
+                            '<td class="positive">' + annualOpSavings + '</td>';
+                    });
+                }
+                
+                createFinancialChart(scenarioData, inputs);
+            } catch (error) {
+                console.error('Error updating financial results:', error);
+            }
+        }
+        
+        function updateL70vsL90Comparison(resultsL90, resultsL70, inputs) {
+            try {
+                var adjustedBaselineL90 = {};
+                for (var key in inputs.baseline) {
+                    adjustedBaselineL90[key] = inputs.baseline[key];
+                }
+                adjustedBaselineL90.qty = inputs.baseline.qty / inputs.l90Factor;
+                
+                var adjustedProposedL90 = {};
+                for (var key in inputs.proposed) {
+                    adjustedProposedL90[key] = inputs.proposed[key];
+                }
+                adjustedProposedL90.qty = inputs.proposed.qty / inputs.l90Factor;
+                
+                var adjustedBaselineL70 = {};
+                for (var key in inputs.baseline) {
+                    adjustedBaselineL70[key] = inputs.baseline[key];
+                }
+                adjustedBaselineL70.qty = inputs.baseline.qty / inputs.l70Factor;
+                
+                var adjustedProposedL70 = {};
+                for (var key in inputs.proposed) {
+                    adjustedProposedL70[key] = inputs.proposed[key];
+                }
+                adjustedProposedL70.qty = inputs.proposed.qty / inputs.l70Factor;
+                
+                var baseL90A = calculateLuminaire(inputs, adjustedBaselineL90, 'without', 'L90');
+                var baseL70A = calculateLuminaire(inputs, adjustedBaselineL70, 'without', 'L70');
+                var baseL90B = calculateLuminaire(inputs, adjustedProposedL90, 'without', 'L90');
+                var baseL70B = calculateLuminaire(inputs, adjustedProposedL70, 'without', 'L70');
+                
+                var gwpTotalA_L90 = document.getElementById('gwpTotalA_L90');
+                var gwpTotalA_L70 = document.getElementById('gwpTotalA_L70');
+                var gwpDiffAElement = document.getElementById('gwpDiffA');
+                
+                if (gwpTotalA_L90) gwpTotalA_L90.textContent = formatNumber(baseL90A.totalGWP);
+                if (gwpTotalA_L70) gwpTotalA_L70.textContent = formatNumber(baseL70A.totalGWP);
+                
+                var diffA = baseL70A.totalGWP > 0 ? 
+                    ((baseL90A.totalGWP - baseL70A.totalGWP) / baseL70A.totalGWP * 100).toFixed(1) : '0';
+                if (gwpDiffAElement) {
+                    gwpDiffAElement.textContent = diffA + '%';
+                    gwpDiffAElement.className = parseFloat(diffA) < 0 ? 'result-value positive' : 'result-value negative';
+                }
+                
+                var gwpTotalB_L90 = document.getElementById('gwpTotalB_L90');
+                var gwpTotalB_L70 = document.getElementById('gwpTotalB_L70');
+                var gwpDiffBElement = document.getElementById('gwpDiffB');
+                
+                if (gwpTotalB_L90) gwpTotalB_L90.textContent = formatNumber(baseL90B.totalGWP);
+                if (gwpTotalB_L70) gwpTotalB_L70.textContent = formatNumber(baseL70B.totalGWP);
+                
+                var diffB = baseL70B.totalGWP > 0 ? 
+                    ((baseL90B.totalGWP - baseL70B.totalGWP) / baseL70B.totalGWP * 100).toFixed(1) : '0';
+                if (gwpDiffBElement) {
+                    gwpDiffBElement.textContent = diffB + '%';
+                    gwpDiffBElement.className = parseFloat(diffB) < 0 ? 'result-value positive' : 'result-value negative';
+                }
+                
+                var tbody = document.getElementById('gwpComponentTable');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    
+                    var data = [
+                        { name: 'Luminaire A', lifetime: 'L90', data: baseL90A, qty: adjustedBaselineL90.qty },
+                        { name: 'Luminaire A', lifetime: 'L70', data: baseL70A, qty: adjustedBaselineL70.qty },
+                        { name: 'Luminaire B', lifetime: 'L90', data: baseL90B, qty: adjustedProposedL90.qty },
+                        { name: 'Luminaire B', lifetime: 'L70', data: baseL70B, qty: adjustedProposedL70.qty }
+                    ];
+                    
+                    data.forEach(function(item) {
+                        var row = tbody.insertRow();
+                        row.innerHTML = '<td>' + item.name + ' (' + formatNumber(item.qty, 1) + ' units)</td>' +
+                            '<td>' + item.lifetime + ' (' + item.data.replacements + ' repl.)</td>' +
+                            '<td>' + formatNumber(item.data.embodiedGWP) + '</td>' +
+                            '<td>' + formatNumber(item.data.operationalGWP) + '</td>' +
+                            '<td>' + formatNumber(item.data.eolGWP) + '</td>' +
+                            '<td>' + formatNumber(item.data.totalGWP) + '</td>';
+                    });
+                }
+                
+                createL70vsL90StackedChart(baseL90A, baseL70A, baseL90B, baseL70B, 
+                    adjustedBaselineL90.qty, adjustedBaselineL70.qty, 
+                    adjustedProposedL90.qty, adjustedProposedL70.qty);
+            } catch (error) {
+                console.error('Error updating L70 vs L90 comparison:', error);
+            }
+        }
+        
+        function createL70vsL90StackedChart(baseL90A, baseL70A, baseL90B, baseL70B, qtyL90A, qtyL70A, qtyL90B, qtyL70B) {
+            try {
+                var canvas = document.getElementById('l70vsl90Chart');
+                if (!canvas) return;
+                
+                var ctx = canvas.getContext('2d');
+                
+                if (l70vsl90ChartInstance) {
+                    l70vsl90ChartInstance.destroy();
+                }
+                
+                var labels = [
+                    'A-L90 (' + formatNumber(qtyL90A, 0) + ' units)', 
+                    'A-L70 (' + formatNumber(qtyL70A, 0) + ' units)', 
+                    'B-L90 (' + formatNumber(qtyL90B, 0) + ' units)', 
+                    'B-L70 (' + formatNumber(qtyL70B, 0) + ' units)'
+                ];
+                
+                var manufacturingData = [
+                    baseL90A.embodiedGWP || 0,
+                    baseL70A.embodiedGWP || 0,
+                    baseL90B.embodiedGWP || 0,
+                    baseL70B.embodiedGWP || 0
+                ];
+                
+                var operationsData = [
+                    baseL90A.operationalGWP || 0,
+                    baseL70A.operationalGWP || 0,
+                    baseL90B.operationalGWP || 0,
+                    baseL70B.operationalGWP || 0
+                ];
+                
+                var eolData = [
+                    baseL90A.eolGWP || 0,
+                    baseL70A.eolGWP || 0,
+                    baseL90B.eolGWP || 0,
+                    baseL70B.eolGWP || 0
+                ];
+                
+                var totals = labels.map(function(_, index) {
+                    return manufacturingData[index] + operationsData[index] + eolData[index];
+                });
+                
+                var replacements = [
+                    baseL90A.replacements || 0,
+                    baseL70A.replacements || 0,
+                    baseL90B.replacements || 0,
+                    baseL70B.replacements || 0
+                ];
+                
+                l70vsl90ChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Manufacturing (A)',
+                                data: manufacturingData,
+                                backgroundColor: 'rgba(255, 159, 64, 0.8)',
+                                borderColor: 'rgba(255, 159, 64, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Operations (B)',
+                                data: operationsData,
+                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'End of Life (C)',
+                                data: eolData,
+                                backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'GWP L90 vs L70 Comparison (Adjusted Quantities)',
+                                color: '#333333',
+                                font: { size: 20, weight: 'bold' }
+                            },
+                            legend: {
+                                position: 'top',
+                                labels: { 
+                                    color: '#333333',
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        var label = context.dataset.label || '';
+                                        var value = context.parsed.y || 0;
+                                        var total = totals[context.dataIndex] || 1;
+                                        var percentage = ((value / total) * 100).toFixed(1);
+                                        return label + ': ' + formatNumber(value) + ' kgCO2e (' + percentage + '%)';
+                                    },
+                                    footer: function(tooltipItems) {
+                                        if (tooltipItems.length > 0) {
+                                            var index = tooltipItems[0].dataIndex;
+                                            var total = totals[index] || 0;
+                                            var repl = replacements[index] || 0;
+                                            return [
+                                                'Total: ' + formatNumber(total) + ' kgCO2e',
+                                                'Replacements: ' + repl
+                                            ];
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { 
+                                    color: '#666666',
+                                    font: { size: 11 }
+                                },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: { 
+                                    color: '#666666',
+                                    callback: function(value) {
+                                        return formatNumber(value);
+                                    }
+                                },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                title: {
+                                    display: true,
+                                    text: 'GWP (kgCO2e)',
+                                    color: '#666666'
+                                }
+                            }
                         }
                     }
-                }
-            }
-        };
-
-        function renderLuminaireHTML(i) {
-            // Default values for luminaire inputs
-            const defaultWattageVals = [12, 10, 12];
-            const defaultFluxVals = [1000, 1000, 900];
-            const defaultQuantityVals = [120, 100, 130];
-            const defaultL70Vals = [100000, 80000, 70000];
-            const defaultL90Vals = [50000, 40000, 35000];
-            const defaultGwpAVals = [10, 11, 15];
-            const defaultGwpEOLVals = [0.5, 0.5, 1];
-
-            const defaultWattageVal = defaultWattageVals[i-1];
-            const defaultFluxVal = defaultFluxVals[i-1];
-            let defaultEfficacyVal = (defaultWattageVal > 0 && defaultFluxVal >= 0) ? (defaultFluxVal / defaultWattageVal).toFixed(2) : '';
-            
-            return `
-            <section id="luminaire${i}" class="p-6 bg-gray-50 simple-section">
-                <h2 class="text-xl font-semibold text-black mb-4">Luminaire ${i}</h2>
-                <div class="space-y-4">
-                    <div><label for="wattage${i}" class="block text-sm font-medium text-black mb-1">Wattage (W)</label><input type="number" id="wattage${i}" value="${defaultWattageVal}" step="0.1" class="form-input w-full p-2"></div>
-                    <div><label for="fluxLumen${i}" class="block text-sm font-medium text-black mb-1">Flux Lumens (lm)</label><input type="number" id="fluxLumen${i}" value="${defaultFluxVal}" step="10" class="form-input w-full p-2"></div>
-                    <div><label for="efficacy${i}" class="block text-sm font-medium text-black mb-1">Efficacy (lm/W)</label><input type="number" id="efficacy${i}" value="${defaultEfficacyVal}" step="0.01" class="form-input w-full p-2 bg-gray-100 text-gray-600" readonly title="Calculated as Flux Lumens / Wattage. Informational."></div>
-                    <div><label for="quantity${i}" class="block text-sm font-medium text-black mb-1">Quantity</label><input type="number" id="quantity${i}" value="${defaultQuantityVals[i-1]}" step="1" class="form-input w-full p-2"></div>
-                    <div><label for="lifetimeL70_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L70 (hours)</label><input type="number" id="lifetimeL70_${i}" value="${defaultL70Vals[i-1]}" step="1000" class="form-input w-full p-2"></div>
-                    <div><label for="lifetimeL90_${i}" class="block text-sm font-medium text-black mb-1">Lifetime L90 (hours)</label><input type="number" id="lifetimeL90_${i}" value="${defaultL90Vals[i-1]}" step="1000" class="form-input w-full p-2"></div>
-                    <div><label for="gwpStageA${i}" class="block text-sm font-medium text-black mb-1">GWP - Stage A (kgCO2e/unit)</label><input type="number" id="gwpStageA${i}" value="${defaultGwpAVals[i-1]}" step="0.1" class="form-input w-full p-2"></div>
-                    <div><label for="gwpEOL${i}" class="block text-sm font-medium text-black mb-1">GWP - EOL (kgCO2e/unit)</label><input type="number" id="gwpEOL${i}" value="${defaultGwpEOLVals[i-1]}" step="0.1" class="form-input w-full p-2"></div>
-                </div>
-            </section>`;
-        }
-
-        function initializeLuminaireInputsAndEfficacyListeners() {
-            luminairesGridContainer.innerHTML = [1, 2, 3].map(renderLuminaireHTML).join('');
-            for (let i = 1; i <= 3; i++) {
-                const wattageEl = document.getElementById(`wattage${i}`);
-                const fluxEl = document.getElementById(`fluxLumen${i}`);
-                const efficacyEl = document.getElementById(`efficacy${i}`);
-                if (!wattageEl || !fluxEl || !efficacyEl) continue; 
-                function updateEfficacy() {
-                    const wattage = parseFloat(wattageEl.value);
-                    const flux = parseFloat(fluxEl.value);
-                    efficacyEl.value = (wattage > 0 && flux >= 0) ? (flux / wattage).toFixed(2) : '';
-                }
-                wattageEl.addEventListener('input', updateEfficacy);
-                fluxEl.addEventListener('input', updateEfficacy);
+                });
+            } catch (error) {
+                console.error('Error creating L70 vs L90 chart:', error);
             }
         }
         
-        initializeLuminaireInputsAndEfficacyListeners();
-
-        function switchToTab(tabName) {
-            tabDataBtn.classList.toggle('active', tabName === 'data');
-            tabResultsBtn.classList.toggle('active', tabName !== 'data'); 
-            tabDataContent.classList.toggle('hidden', tabName !== 'data');
-            tabResultsContent.classList.toggle('hidden', tabName !== 'results'); 
+        function createGWPStackedChart(scenarioData, adjustedBaselineQty, adjustedProposedQty) {
+            try {
+                var canvas = document.getElementById('gwpChart');
+                if (!canvas) return;
+                
+                var ctx = canvas.getContext('2d');
+                
+                if (gwpChartInstance) {
+                    gwpChartInstance.destroy();
+                }
+                
+                var labels = [];
+                var manufacturingData = [];
+                var operationsData = [];
+                var eolData = [];
+                
+                scenarioData.forEach(function(item) {
+                    var scenarioName = item[0];
+                    var data = item[1];
+                    labels.push('Baseline A - ' + scenarioName);
+                    manufacturingData.push(data.baseline.embodiedGWP || 0);
+                    operationsData.push(data.baseline.operationalGWP || 0);
+                    eolData.push(data.baseline.eolGWP || 0);
+                    
+                    labels.push('Proposed B - ' + scenarioName);
+                    manufacturingData.push(data.proposed.embodiedGWP || 0);
+                    operationsData.push(data.proposed.operationalGWP || 0);
+                    eolData.push(data.proposed.eolGWP || 0);
+                });
+                
+                var totals = labels.map(function(_, index) {
+                    return manufacturingData[index] + operationsData[index] + eolData[index];
+                });
+                
+                gwpChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Manufacturing (A)',
+                                data: manufacturingData,
+                                backgroundColor: 'rgba(255, 159, 64, 0.8)',
+                                borderColor: 'rgba(255, 159, 64, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Operations (B)',
+                                data: operationsData,
+                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'End of Life (C)',
+                                data: eolData,
+                                backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'GWP Lifecycle Comparison (L90 Baseline) - Adjusted Quantities: A: ' + formatNumber(adjustedBaselineQty, 1) + ' units | B: ' + formatNumber(adjustedProposedQty, 1) + ' units',
+                                color: '#333333',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            legend: {
+                                position: 'top',
+                                labels: { 
+                                    color: '#333333',
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        var label = context.dataset.label || '';
+                                        var value = context.parsed.y || 0;
+                                        var total = totals[context.dataIndex] || 1;
+                                        var percentage = ((value / total) * 100).toFixed(1);
+                                        return label + ': ' + formatNumber(value) + ' kgCO2e (' + percentage + '%)';
+                                    },
+                                    footer: function(tooltipItems) {
+                                        if (tooltipItems.length > 0) {
+                                            var index = tooltipItems[0].dataIndex;
+                                            var total = totals[index] || 0;
+                                            return 'Total: ' + formatNumber(total) + ' kgCO2e';
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { 
+                                    color: '#666666',
+                                    font: { size: 10 },
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    callback: function(value, index) {
+                                        var label = this.getLabelForValue(value);
+                                        if (label.includes('Without Control')) return label.replace('Without Control', 'No Control');
+                                        if (label.includes('With Control System')) return label.replace('With Control System', 'Control');
+                                        if (label.includes('With Control + Maintenance Dimming')) return label.replace('With Control + Maintenance Dimming', 'Control + M.Dim');
+                                        return label;
+                                    }
+                                },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: { 
+                                    color: '#666666',
+                                    callback: function(value) {
+                                        return formatNumber(value);
+                                    }
+                                },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                title: {
+                                    display: true,
+                                    text: 'GWP (kgCO2e)',
+                                    color: '#666666'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating GWP stacked chart:', error);
+            }
         }
-
-        tabDataBtn.addEventListener('click', () => switchToTab('data'));
-        tabResultsBtn.addEventListener('click', () => switchToTab('results'));
-        backToDataBtn.addEventListener('click', () => switchToTab('data'));
         
-        function getFormValue(id, isFloat = true) {
-            const element = document.getElementById(id);
-            if (!element) { console.error(`Element ${id} not found.`); return NaN; }
-            const value = element.value;
-            const numValue = isFloat ? parseFloat(value) : parseInt(value);
-            if (isNaN(numValue)) console.warn(`Value for ${id} is NaN: "${value}"`);
-            return numValue;
+        function createFinancialChart(scenarioData, inputs) {
+            try {
+                var canvas = document.getElementById('financialChart');
+                if (!canvas) return;
+                
+                var ctx = canvas.getContext('2d');
+                
+                if (financialChartInstance) {
+                    financialChartInstance.destroy();
+                }
+                
+                var labels = [];
+                var initialCostData = [];
+                var replacementCostData = [];
+                var operationalCostData = [];
+                
+                scenarioData.forEach(function(item) {
+                    var scenarioName = item[0];
+                    var data = item[1];
+                    labels.push('Baseline A - ' + scenarioName);
+                    initialCostData.push(data.baseline.initialCost || 0);
+                    
+                    var baselineTotalCost = data.baseline.totalCost || 0;
+                    var baselineInitialCost = data.baseline.initialCost || 0;
+                    
+                    var baselineOpCost = 0;
+                    for (var year = 0; year < inputs.projectLife; year++) {
+                        baselineOpCost += (data.baseline.annualOperatingCost || 0) * Math.pow(1 + inputs.inflationRate, year);
+                    }
+                    operationalCostData.push(baselineOpCost);
+                    
+                    var baselineReplacementCost = baselineTotalCost - baselineInitialCost - baselineOpCost;
+                    replacementCostData.push(Math.max(0, baselineReplacementCost));
+                    
+                    labels.push('Proposed B - ' + scenarioName);
+                    initialCostData.push(data.proposed.initialCost || 0);
+                    
+                    var proposedOpCost = 0;
+                    for (var year = 0; year < inputs.projectLife; year++) {
+                        proposedOpCost += (data.proposed.annualOperatingCost || 0) * Math.pow(1 + inputs.inflationRate, year);
+                    }
+                    operationalCostData.push(proposedOpCost);
+                    
+                    var proposedTotalCost = data.proposed.totalCost || 0;
+                    var proposedInitialCost = data.proposed.initialCost || 0;
+                    var proposedReplacementCost = proposedTotalCost - proposedInitialCost - proposedOpCost;
+                    replacementCostData.push(Math.max(0, proposedReplacementCost));
+                });
+                
+                var totals = labels.map(function(_, index) {
+                    return initialCostData[index] + replacementCostData[index] + operationalCostData[index];
+                });
+                
+                financialChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Initial Investment',
+                                data: initialCostData,
+                                backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Replacement Costs',
+                                data: replacementCostData,
+                                backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                                borderColor: 'rgba(255, 206, 86, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Operational Costs',
+                                data: operationalCostData,
+                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Total Cost Comparison (' + inputs.projectLife + '-Year Project Life) - L90 Baseline',
+                                color: '#333333',
+                                font: { size: 16, weight: 'bold' }
+                            },
+                            legend: {
+                                position: 'top',
+                                labels: { 
+                                    color: '#333333',
+                                    padding: 15,
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        var label = context.dataset.label || '';
+                                        var value = context.parsed.y || 0;
+                                        var total = totals[context.dataIndex] || 1;
+                                        var percentage = ((value / total) * 100).toFixed(1);
+                                        return label + ': $' + formatNumber(value) + ' (' + percentage + '%)';
+                                    },
+                                    footer: function(tooltipItems) {
+                                        if (tooltipItems.length > 0) {
+                                            var index = tooltipItems[0].dataIndex;
+                                            var total = totals[index] || 0;
+                                            return 'Total: $' + formatNumber(total);
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { 
+                                    color: '#666666',
+                                    font: { size: 10 },
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    callback: function(value, index) {
+                                        var label = this.getLabelForValue(value);
+                                        if (label.includes('Without Control')) return label.replace('Without Control', 'No Control');
+                                        if (label.includes('With Control System')) return label.replace('With Control System', 'Control');
+                                        if (label.includes('With Control + Maintenance Dimming')) return label.replace('With Control + Maintenance Dimming', 'Control + M.Dim');
+                                        return label;
+                                    }
+                                },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: { 
+                                    color: '#666666',
+                                    callback: function(value) {
+                                        return '$' + formatNumber(value);
+                                    }
+                                },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                title: {
+                                    display: true,
+                                    text: 'Total Cost ($)',
+                                    color: '#666666'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating financial chart:', error);
+            }
         }
-
-        gwpForm.addEventListener('submit', function(event) {
-            event.preventDefault(); 
-            if (calculateAndDisplayResults()) { 
-                switchToTab('results'); 
+        
+        window.addEventListener('load', function() {
+            try {
+                updateEfficacy('baseline');
+                updateEfficacy('proposed');
+                calculateAll();
+            } catch (error) {
+                console.error('Error on page load:', error);
             }
         });
-
-        function calculateAndDisplayResults() {
-            const projectParams = {
-                co2GridFactor: getFormValue('co2GridFactor'),
-                controlSystemCoefficient: getFormValue('controlSystemCoefficient'),
-                operationalHoursYear: getFormValue('operationalHoursYear'),
-                anticipatedProjectLife: getFormValue('anticipatedProjectLife'),
-                maintenanceDimmingSavings: getFormValue('maintenanceDimmingSavings'),
-                maintenanceFactorL70: getFormValue('maintenanceFactorL70'),
-                maintenanceFactorL90: getFormValue('maintenanceFactorL90')
-            };
-
-            if (Object.values(projectParams).some(isNaN) || projectParams.maintenanceFactorL70 <= 0 || projectParams.maintenanceFactorL90 <= 0) {
-                window.alert("Ensure all Project Parameters are valid numbers and maintenance factors are > 0.");
-                return false;
-            }
-
-            currentLuminairesDataStorage = []; 
-            for (let i = 1; i <= 3; i++) {
-                const luminaireInputs = {
-                    name: `Luminaire ${i}`, 
-                    wattage: getFormValue(`wattage${i}`),
-                    quantity: getFormValue(`quantity${i}`), lifetimeL70: getFormValue(`lifetimeL70_${i}`),
-                    lifetimeL90: getFormValue(`lifetimeL90_${i}`), gwpStageA_unit: getFormValue(`gwpStageA${i}`),
-                    gwpEOL_unit: getFormValue(`gwpEOL${i}`)
-                };
-
-                if (Object.values(luminaireInputs).slice(1).some(isNaN) || luminaireInputs.lifetimeL70 <= 0 || luminaireInputs.lifetimeL90 <= 0) {
-                    window.alert(`Ensure all fields for Luminaire ${i} are valid numbers and lifetimes > 0.`);
-                    return false;
-                }
-
-                const totalOpHours = projectParams.operationalHoursYear * projectParams.anticipatedProjectLife;
-                const calcGwp_A_EOL_Components = (lifetime) => {
-                    const replacements = Math.max(0, Math.ceil(totalOpHours / lifetime) - 1); 
-                    return { 
-                        gwp_A: luminaireInputs.gwpStageA_unit * luminaireInputs.quantity * (1 + replacements), 
-                        gwp_EOL: luminaireInputs.gwpEOL_unit * luminaireInputs.quantity * (1 + replacements) 
-                    };
-                };
-
-                const componentsL70_AEOL = calcGwp_A_EOL_Components(luminaireInputs.lifetimeL70);
-                const componentsL90_AEOL = calcGwp_A_EOL_Components(luminaireInputs.lifetimeL90);
-                const baseEnergyConsumptionProjectLife = (luminaireInputs.wattage / 1000) * projectParams.operationalHoursYear * luminaireInputs.quantity * projectParams.anticipatedProjectLife;
-                const gwp_B_base_unadjusted = baseEnergyConsumptionProjectLife * projectParams.co2GridFactor;
-
-                const gwp_B_L70_adjusted = gwp_B_base_unadjusted / projectParams.maintenanceFactorL70;
-                const gwp_B_L90_adjusted = gwp_B_base_unadjusted / projectParams.maintenanceFactorL90;
-                const gwp_B_L90_control = gwp_B_L90_adjusted * (1 - projectParams.controlSystemCoefficient / 100);
-                const gwp_B_L90_control_maint = gwp_B_L90_control * (1 - projectParams.maintenanceDimmingSavings / 100);
-
-                currentLuminairesDataStorage.push({
-                    name: luminaireInputs.name, 
-                    l70_base: { gwp_A: componentsL70_AEOL.gwp_A, gwp_B_op: gwp_B_L70_adjusted, gwp_EOL: componentsL70_AEOL.gwp_EOL },
-                    l90_base: { gwp_A: componentsL90_AEOL.gwp_A, gwp_B_op: gwp_B_L90_adjusted, gwp_EOL: componentsL90_AEOL.gwp_EOL },
-                    l90_control: { gwp_A: componentsL90_AEOL.gwp_A, gwp_B_op: gwp_B_L90_control, gwp_EOL: componentsL90_AEOL.gwp_EOL },
-                    l90_control_maint: { gwp_A: componentsL90_AEOL.gwp_A, gwp_B_op: gwp_B_L90_control_maint, gwp_EOL: componentsL90_AEOL.gwp_EOL }
-                });
-            }
-            updateCharts(currentLuminairesDataStorage); 
-            return true; 
-        }
-
-        function createStackedDatasets(data, scenarioKey, scenarioDisplayName, stackGroup, colorSet) {
-            const displaySuffix = scenarioDisplayName ? ` - ${scenarioDisplayName}` : '';
-            return [
-                { label: `Operational (B)${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_B_op), backgroundColor: colorSet.op, stack: `stack_${stackGroup}` },
-                { label: `Manufacturing (A)${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_A), backgroundColor: colorSet.mfg, stack: `stack_${stackGroup}` },
-                { label: `EOL${displaySuffix}`, data: data.map(d => d[scenarioKey].gwp_EOL), backgroundColor: colorSet.eol, stack: `stack_${stackGroup}` }
-            ];
-        }
-
-        function updateCharts(data) {
-            const labels = data.map(d => d.name); 
-
-            const maxGwpValues = [];
-            data.forEach(d => {
-                maxGwpValues.push(d.l70_base.gwp_A + d.l70_base.gwp_B_op + d.l70_base.gwp_EOL);
-                maxGwpValues.push(d.l90_base.gwp_A + d.l90_base.gwp_B_op + d.l90_base.gwp_EOL);
-                maxGwpValues.push(d.l90_control.gwp_A + d.l90_control.gwp_B_op + d.l90_control.gwp_EOL);
-                maxGwpValues.push(d.l90_control_maint.gwp_A + d.l90_control_maint.gwp_B_op + d.l90_control_maint.gwp_EOL);
-            });
-            const maxGwp = Math.max(0, ...maxGwpValues); 
-            const yAxisMax = Math.ceil(maxGwp * 1.1) || 10; 
-
-            const consistentChartOptions = {
-                ...commonChartOptions, 
-                scales: {
-                    ...commonChartOptions.scales, 
-                    y: {
-                        ...commonChartOptions.scales.y, 
-                        max: yAxisMax 
-                    }
-                }
-            };
-
-            if (gwpL70L90ChartInstance) gwpL70L90ChartInstance.destroy(); 
-            gwpL70L90ChartInstance = new Chart(document.getElementById('gwpL70L90Chart'), {
-                type: 'bar', 
-                data: { 
-                    labels, 
-                    datasets: [ 
-                        ...createStackedDatasets(data, 'l70_base', 'L70', 'L70', stageColorsPrimary), 
-                        ...createStackedDatasets(data, 'l90_base', 'L90', 'L90', stageColorsSecondary) 
-                    ]
-                }, 
-                options: consistentChartOptions 
-            });
-
-            if (gwpControlChartInstance) gwpControlChartInstance.destroy();
-            gwpControlChartInstance = new Chart(document.getElementById('gwpControlChart'), {
-                type: 'bar', 
-                data: { 
-                    labels, 
-                    datasets: [ 
-                        ...createStackedDatasets(data, 'l90_base', 'L90 Baseline', 'L90Base', stageColorsPrimary), 
-                        ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90Control', stageColorsSecondary) 
-                    ]
-                }, 
-                options: consistentChartOptions 
-            });
-            
-            if (gwpMaintenanceDimmingChartInstance) gwpMaintenanceDimmingChartInstance.destroy();
-            gwpMaintenanceDimmingChartInstance = new Chart(document.getElementById('gwpMaintenanceDimmingChart'), {
-                type: 'bar', 
-                data: { 
-                    labels, 
-                    datasets: [ 
-                        ...createStackedDatasets(data, 'l90_control', 'L90 w/ Control', 'L90ControlAgain', stageColorsPrimary), 
-                        ...createStackedDatasets(data, 'l90_control_maint', 'L90 w/ Control & Maint. Dimming', 'L90ControlMaint', stageColorsSecondary) 
-                    ]
-                }, 
-                options: consistentChartOptions 
-            });
-        }
         
-        switchToTab('data'); 
-        calculateAndDisplayResults(); 
-
-    </script>
+        window.showTab = showTab;
+        window.updateEfficacy = updateEfficacy;
+        window.calculateAll = calculateAll;
+    })();</script>
 </body>
 </html>

@@ -1,305 +1,195 @@
-# README: Luminaire GWP Calculator and Comparison Tool
+# Luminaire GWP & Cost Assessment Tool
 
-## 1. Project Overview
+A comprehensive web-based tool for evaluating the environmental and financial impacts of lighting systems throughout their lifecycle, comparing Global Warming Potential (GWP) and total cost of ownership.
 
-The "Luminaire GWP Calculator and Comparison Tool" is a single-page web application designed to help users assess and compare the Global Warming Potential (GWP) of different lighting setups. Users can input project-specific parameters and detailed data for up to three types of luminaires. The tool then calculates the GWP across various lifecycle stages (Manufacturing - Stage A, Operational Use - Stage B, End-of-Life - Stage EOL) and visualizes these results in stacked bar charts. These charts allow for easy comparison under different operational scenarios (L70 vs. L90 lifetimes, impact of control systems, and maintenance dimming), with detailed information available through interactive tooltips for each bar segment.
+**Developed by:** Dimitrios Tsiokaras - [dimitrios@electrolight.com](mailto:dimitrios@electrolight.com)
 
-The application is built as a single HTML file, utilizing Tailwind CSS for styling and Chart.js for dynamic data visualization. The user interface aims for a clean, minimalist design with "Noto Sans" as the primary font.
+## Overview
 
-## 2. Key Features
+The Luminaire GWP & Cost Assessment Tool enables lighting professionals to make data-driven decisions by comparing different luminaire options across multiple dimensions:
+- Environmental impact (GWP/carbon footprint)
+- Total cost of ownership
+- Impact of control systems
+- L70 vs L90 lifetime comparisons
 
-- **Data Input:** Allows for comprehensive data entry for overall project parameters and specific details for up to three distinct luminaires.
-    
-- **GWP Calculation:** Implements detailed GWP calculations considering:
-    
-    - Manufacturing (Stage A) based on per-unit GWP and quantity, including replacements.
-        
-    - Operational Use (Stage B) based on wattage, operational hours, project life, CO2e grid factor, and adjusted by maintenance factors (L70 & L90).
-        
-    - End-of-Life (Stage EOL) based on per-unit GWP and quantity, including replacements.
-        
-- **Scenario Analysis:**
-    
-    - Compares GWP based on L70 and L90 luminaire lifetimes.
-        
-    - Analyzes GWP reduction with control systems (using L90 lifetime as a baseline).
-        
-    - Analyzes GWP reduction with control systems combined with maintenance dimming (using L90 lifetime as a baseline).
-        
-- **Graphical Results:** Displays GWP comparisons in three interactive stacked bar charts.
-    
-    - Bar segments are color-coded by GWP stage (Operational, Manufacturing, EOL).
-        
-    - Compared scenarios within a single chart (e.g., L70 vs L90) use distinct shades of these base colors for clarity.
-        
-    - Detailed tooltips appear on hover for each individual bar segment, providing specific GWP values and scenario details.
-        
-- **Responsive Design:** The application is designed to be responsive and usable across various screen sizes.
-    
-- **Simplified UI:** Features a minimalist design with clear typography and simple line-based UI elements.
-    
+## Features
 
-## 3. Design and Layout
+### 1. **L70 vs L90 Comparison**
+- Compares environmental impact using different lifetime maintenance factors
+- Automatically adjusts quantities based on maintenance factors (÷0.9 for L90, ÷0.7 for L70)
+- Calculates replacement schedules based on respective lifetimes
+- Visual comparison through stacked bar charts
 
-The application is structured as a single page with two main tabs:
+### 2. **GWP Lifecycle Analysis**
+- Evaluates carbon footprint across three lifecycle stages:
+  - **Stage A**: Manufacturing (embodied carbon)
+  - **Stage B**: Operations (energy consumption)
+  - **Stage C**: End of Life (disposal/recycling)
+- Progressive analysis showing impact of:
+  - Base scenario (no controls)
+  - With control systems
+  - With control systems + maintenance dimming
 
-- **Header:**
-    
-    - Main Title: "LUMINAIRE GWP CALCULATOR AND COMPARISON TOOL"
-        
-    - Developer Credit: "Developed by Dimitrios Tsiokaras - dimitrios@electrolight.com"
-        
-- **Main Content Area:**
-    
-    - **Tabs Navigation:**
-        
-        - "DATA" Tab: Active by default, for all user inputs.
-            
-        - "RESULTS" Tab: For displaying calculated GWP charts.
-            
-        - Active tab is indicated by a black bottom border and black text; inactive tabs have gray text.
-            
-    - **"DATA" Tab Content:**
-        
-        - Introductory paragraph explaining the purpose of the section.
-            
-        - **Project Parameters Section:** A bordered section for global inputs like CO2e grid factor, control savings, operational hours, project life, maintenance dimming savings, and L70/L90 maintenance factors.
-            
-        - **Luminaires Input Section:** A grid layout dynamically populated with input sections for up to three luminaires. Each luminaire section is bordered and includes fields for its specific data.
-            
-        - "Calculate & View Results" Button: A prominent black button to trigger calculations and switch to the results view.
-            
-    - **"RESULTS" Tab Content:**
-        
-        - Introductory paragraph explaining the charts.
-            
-        - **Charts Display:** A layout displaying three chart containers. Each chart container has a border and a title.
-            
-            - Chart 1: GWP L90 vs L70 Comparison
-                
-            - Chart 2: GWP Comparison With Control (L90 Baseline)
-                
-            - Chart 3: GWP With Control & Maintenance Dimming (L90 Baseline)
-                
-        - "Back to Data" Button: A gray button to navigate back to the data input tab.
-            
-- **Footer:**
-    
-    - A simple text indicating "Luminaire GWP Calculator v1.0".
-        
+### 3. **Financial Analysis**
+- Comprehensive total cost of ownership calculation including:
+  - Initial investment costs
+  - Replacement costs over project lifetime
+  - Operational costs (with inflation adjustment)
+- Control system cost multiplier effects
+- Annual operational savings calculations
 
-## 4. Input Fields
+### 4. **Control System Modeling**
+- Models the impact of lighting controls on both GWP and costs
+- Configurable control coefficient (default 0.75 = 25% energy reduction)
+- Maintenance dimming factor to account for overlighting compensation
 
-All input fields use a simple border style and are clearly labeled in black text.
+## Getting Started
 
-### 4.1. Project Parameters (Located in the "DATA" Tab)
+### Requirements
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- No installation required - runs entirely in browser
+- Internet connection (for loading Chart.js library)
 
-- `CO2e Grid Factor (kg/kWh)`: Default: `0.233`
-    
-- `Control System Savings (%)`: Default: `30`
-    
-- `Operational Hours/Year`: Default: `3000`
-    
-- `Anticipated Project Life (years)`: Default: `10`
-    
-- `Maintenance Dimming Savings (%)`: Default: `10`
-    
-- `Maintenance Factor L70`: Default: `0.70` (Used to adjust operational GWP for L70 scenarios)
-    
-- `Maintenance Factor L90`: Default: `0.90` (Used to adjust operational GWP for L90 scenarios)
-    
+### Usage
+1. Open the HTML file in a web browser
+2. A welcome modal will appear explaining the tool's purpose
+3. Enter your specific data in the "Data Entry" tab
+4. Click "Calculate Analysis" to generate results
+5. Navigate between tabs to view different analyses
 
-### 4.2. Luminaire Specific Data (Repeated for Luminaire 1, Luminaire 2, Luminaire 3 in the "DATA" Tab)
+## Input Parameters
 
-Default values are based on the user-provided screenshot:
+### Market Data
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| CO2e Grid Factor | Carbon intensity of electricity grid (kg/kWh) | 0.39 |
+| Current Electricity Rate | Cost of electricity ($/kWh) | 0.26 |
+| Average Inflation Rate | Annual inflation rate for cost projections | 0.03 |
 
-- **Luminaire 1 Defaults:**
-    
-    - `Wattage (W)`: `12`
-        
-    - `Flux Lumens (lm)`: `1000`
-        
-    - `Efficacy (lm/W)`: Auto-calculated (`83.33`), read-only.
-        
-    - `Quantity`: `120`
-        
-    - `Lifetime L70 (hours)`: `100000`
-        
-    - `Lifetime L90 (hours)`: `50000`
-        
-    - `GWP - Stage A (kgCO2e/unit)`: `10`
-        
-    - `GWP - EOL (kgCO2e/unit)`: `0.5`
-        
-- **Luminaire 2 Defaults:**
-    
-    - `Wattage (W)`: `10`
-        
-    - `Flux Lumens (lm)`: `1000`
-        
-    - `Efficacy (lm/W)`: Auto-calculated (`100.00`), read-only.
-        
-    - `Quantity`: `100`
-        
-    - `Lifetime L70 (hours)`: `80000`
-        
-    - `Lifetime L90 (hours)`: `40000`
-        
-    - `GWP - Stage A (kgCO2e/unit)`: `11`
-        
-    - `GWP - EOL (kgCO2e/unit)`: `0.5`
-        
-- **Luminaire 3 Defaults:**
-    
-    - `Wattage (W)`: `12`
-        
-    - `Flux Lumens (lm)`: `900`
-        
-    - `Efficacy (lm/W)`: Auto-calculated (`75.00`), read-only.
-        
-    - `Quantity`: `130`
-        
-    - `Lifetime L70 (hours)`: `70000`
-        
-    - `Lifetime L90 (hours)`: `35000`
-        
-    - `GWP - Stage A (kgCO2e/unit)`: `15`
-        
-    - `GWP - EOL (kgCO2e/unit)`: `1`
-        
+### Project Data
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| Control System Coefficient | Energy reduction factor when controls applied | 0.75 |
+| Control Additional Cost Coefficient | Cost multiplier for control systems | 1.15 |
+| Operational Hours/Year | Annual operating hours | 4990 |
+| Anticipated Project Life | Project duration in years | 15 |
+| L90 Luminaire Maintenance Factor | Light output at L90 lifetime | 0.9 |
+| L70 Luminaire Maintenance Factor | Light output at L70 lifetime | 0.7 |
 
-## 5. Calculation Logic
+### Luminaire Specifications
+For both Baseline (A) and Proposed (B) luminaires:
+- **Wattage** (W)
+- **Flux Lumens** (lm) - light output
+- **Efficacy** (lm/W) - automatically calculated
+- **Quantity** - number of fixtures
+- **L90 Lifetime** (hours) - time to 90% light output
+- **L70 Lifetime** (hours) - time to 70% light output
+- **GWP - Cradle to Gate** (kgCO2e) - manufacturing emissions
+- **GWP - End of Life** (kgCO2e) - disposal emissions
+- **Supply + Install Cost** ($) - per unit cost
 
-The core calculations are performed in JavaScript when the "Calculate & View Results" button is clicked.
+## Calculations & Methodology
 
-1. **Total Operational Hours for Project:**
-    
-    - `TotalOpHours = Operational Hours/Year * Anticipated Project Life (years)`
-        
-2. **Number of Replacements (for Stage A & EOL calculations):**
-    
-    - Calculated separately for L70 and L90 scenarios for each luminaire.
-        
-    - `Replacements = max(0, ceil(TotalOpHours / Luminaire Lifetime (L70 or L90)) - 1)`
-        
-        - This determines the number of _additional_ sets of luminaires needed after the initial installation.
-            
-3. **GWP Stage A (Manufacturing):**
-    
-    - `TotalGWP_A = GWP_Stage_A_per_unit * Quantity * (1 + Replacements)`
-        
-        - `(1 + Replacements)` accounts for the initial set plus all replacement sets.
-            
-4. **GWP Stage EOL (End-of-Life):**
-    
-    - `TotalGWP_EOL = GWP_Stage_EOL_per_unit * Quantity * (1 + Replacements)`
-        
-5. **GWP Stage B (Operational Use - Base, Unadjusted):**
-    
-    - `BaseEnergyConsumption = (Wattage / 1000) * OperationalHoursYear * Quantity * AnticipatedProjectLife`
-        
-    - `GWP_B_Base_Unadjusted = BaseEnergyConsumption * CO2e_GridFactor`
-        
-6. **GWP Stage B (Adjusted by Maintenance Factor):**
-    
-    - For L70 scenarios: `GWP_B_L70_Adjusted = GWP_B_Base_Unadjusted / MaintenanceFactorL70`
-        
-    - For L90 scenarios: `GWP_B_L90_Adjusted = GWP_B_Base_Unadjusted / MaintenanceFactorL90`
-        
-7. **GWP Stage B (With Controls - L90 Baseline):**
-    
-    - `GWP_B_L90_Control = GWP_B_L90_Adjusted * (1 - ControlSystemSavings / 100)`
-        
-8. **GWP Stage B (With Controls & Maintenance Dimming - L90 Baseline):**
-    
-    - `GWP_B_L90_Control_Maint = GWP_B_L90_Control * (1 - MaintenanceDimmingSavings / 100)`
-        
-9. **Total GWP for Scenarios:**
-    
-    - The total GWP for any given scenario is the sum of its calculated `GWP_A`, `GWP_B_op` (operational, adjusted as appropriate for the scenario), and `GWP_EOL`.
-        
+### Quantity Adjustment
+To ensure fair comparison with equivalent light output:
+- L90 analysis: Quantity ÷ 0.9
+- L70 analysis: Quantity ÷ 0.7
 
-## 6. Outputs/Results Display ("RESULTS" Tab)
+### Replacement Calculations
+```
+Lifetime in years = L70/L90 hours ÷ Annual operating hours
+Replacements = CEILING(Project life ÷ Lifetime in years) - 1
+```
 
-The results are visualized using three stacked bar charts, one on top of the other and generated by Chart.js. Each bar in the charts is divided into three segments representing GWP from Stage A (Manufacturing), Stage B (Operational), and Stage EOL.
+### GWP Calculations
+```
+Operational GWP = Total Energy × Grid Factor
+Embodied GWP = Unit GWP × Quantity × (1 + Replacements)
+End of Life GWP = EOL GWP × Quantity × (1 + Replacements)
+Total GWP = Operational + Embodied + End of Life
+```
 
-- **Chart 1: GWP L90 vs L70 Comparison**
-    
-    - Compares two stacks per luminaire:
-        
-        - Stack 1 (L70 Scenario): GWP_A_L70, GWP_B_L70_Adjusted, GWP_EOL_L70. Uses primary colors.
-            
-        - Stack 2 (L90 Scenario): GWP_A_L90, GWP_B_L90_Adjusted, GWP_EOL_L90. Uses secondary (lighter) colors.
-            
-- **Chart 2: GWP Comparison With Control (L90 Baseline)**
-    
-    - Compares two stacks per luminaire, both based on L90 lifetimes and L90 Maintenance Factor:
-        
-        - Stack 1 (L90 Baseline): GWP_A_L90, GWP_B_L90_Adjusted, GWP_EOL_L90. Uses primary colors.
-            
-        - Stack 2 (L90 with Control): GWP_A_L90, GWP_B_L90_Control, GWP_EOL_L90. Uses secondary (lighter) colors.
-            
-- **Chart 3: GWP With Control & Maintenance Dimming (L90 Baseline)**
-    
-    - Compares two stacks per luminaire, both based on L90 lifetimes and L90 Maintenance Factor:
-        
-        - Stack 1 (L90 with Control): GWP_A_L90, GWP_B_L90_Control, GWP_EOL_L90. Uses primary colors.
-            
-        - Stack 2 (L90 with Control & Maintenance Dimming): GWP_A_L90, GWP_B_L90_Control_Maint, GWP_EOL_L90. Uses secondary (lighter) colors.
-            
+### Financial Calculations
+```
+Initial Cost = Unit Cost × Quantity × Control Cost Coefficient
+Replacement Cost = Unit Cost × Quantity × Replacements × Control Cost Coefficient
+Annual Operating Cost = Annual Energy × Electricity Rate
+Total Operating Cost = Σ(Annual Cost × (1 + Inflation Rate)^year)
+Total Cost = Initial + Replacement + Operating Costs
+```
 
-**Chart Styling & Interaction:**
+### Control System Effects
+- Energy consumption multiplied by control coefficient (e.g., 0.75)
+- Costs multiplied by control cost coefficient (e.g., 1.15)
+- Maintenance dimming further reduces energy by maintenance factor
 
-- Font: Noto Sans
-    
-- Colors: Operational (Blue), Manufacturing (Orange), EOL (Gray). Compared scenarios use lighter shades of these base colors.
-    
-- Tooltips: On hovering over any individual bar segment, a tooltip appears showing the specific GWP component (e.g., "Operational (B) - L70") and its calculated GWP value (kgCO2e).
-    
-- Legend: There is no separate legend displayed; all descriptive information is available via the tooltips and chart titles/descriptions.
-    
+## Output Interpretation
 
-## 7. Technologies Used
+### GWP Results
+- **Positive percentages** indicate reduction (improvement)
+- **Negative percentages** indicate increase
+- Results show both A→B comparison and impact of controls
 
-- **HTML5:** Structure of the application.
-    
-- **Tailwind CSS v3:** For styling and responsive layout (loaded via CDN).
-    
-- **JavaScript (ES6+):** For all calculations, DOM manipulation, event handling, and Chart.js integration.
-    
-- **Chart.js (v3.x or v4.x assumed by CDN link):** For creating dynamic and interactive stacked bar charts (loaded via CDN).
-    
-- **Google Fonts:** To load the "Noto Sans" font.
-    
+### Financial Results
+- **Cost savings** shown as percentages
+- **Annual operational savings** in dollars
+- **Payback period** can be inferred from savings rates
 
-## 8. How to Use/Run
+### Charts
+- **Stacked bar charts** show component breakdown
+- **Hover tooltips** provide detailed values and percentages
+- **Color coding**:
+  - Orange: Manufacturing/Initial costs
+  - Blue: Operations/Operating costs
+  - Teal: End of Life
+  - Yellow: Replacement costs
 
-1. Save the entire HTML code as a single `.html` file (e.g., `luminaire_gwp_calculator.html`).
-    
-2. Open this HTML file in any modern web browser (e.g., Chrome, Firefox, Edge, Safari).
-    
-3. The application will load with default values in the "DATA" tab.
-    
-4. Modify the project parameters and luminaire data as needed.
-    
-5. Click the "Calculate & View Results" button.
-    
-6. The application will switch to the "RESULTS" tab and display the generated charts.
-    
-7. Hover over individual bar segments to see detailed GWP information.
-    
-8. Use the "Back to Data" button to return to the input form and make further adjustments.
-    
+## Technical Details
 
-## 9. File Structure
+### Built With
+- **HTML5** - Structure and layout
+- **CSS3** - Styling with Noto Sans font
+- **JavaScript** - Calculations and interactivity
+- **Chart.js 4.4.0** - Data visualization
+- **Google Fonts** - Typography
 
-The entire application is contained within a **single HTML file**. This includes:
+### Browser Compatibility
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-- HTML markup for the structure.
-    
-- CSS styles (inline `<style>` block using Tailwind utility classes and some custom styles).
-    
-- JavaScript code for logic and interactivity (inline `<script>` block).
-    
+### Code Structure
+- Self-contained single HTML file
+- No external dependencies except Chart.js CDN
+- Responsive design for various screen sizes
+- Clean, maintainable JavaScript with error handling
 
-This self-contained nature makes it easy to share and run.
+## Default Values
+
+### Baseline Luminaire A
+- 12W, 1000 lumens (83.3 lm/W)
+- Quantity: 500
+- L90: 50,000 hours
+- L70: 120,000 hours
+
+### Proposed Luminaire B
+- 9W, 1059 lumens (117.7 lm/W)
+- Quantity: 473.48
+- L90: 45,000 hours
+- L70: 100,000 hours
+
+## License
+
+This tool is provided as-is for professional use in lighting design and assessment. For commercial use or redistribution, please contact the developer.
+
+## Contact & Support
+
+**Developer:** Dimitrios Tsiokaras  
+**Email:** [dimitrios@electrolight.com](mailto:dimitrios@electrolight.com)
+
+For bug reports, feature requests, or technical support, please contact the developer directly.
+
+## Acknowledgments
+
+This tool was developed to support sustainable lighting design decisions by providing transparent, comprehensive lifecycle analysis capabilities to lighting professionals.
