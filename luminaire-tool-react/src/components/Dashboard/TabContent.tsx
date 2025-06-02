@@ -1,7 +1,9 @@
 import { useAppContext } from '../../context/AppContext';
+import ProjectInputs from '../Inputs/ProjectInputs';
+import LuminaireInputs from '../Inputs/LuminaireInputs';
 
 export default function TabContent() {
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
 
   const renderTabContent = () => {
     switch (state.activeTab) {
@@ -71,206 +73,23 @@ export default function TabContent() {
 
       case 'inputs':
         return (
-          <div className="bg-white rounded-lg shadow-sm p-lg border border-border">
-            <h2 className="text-xl font-semibold text-text-primary mb-lg">Project Inputs</h2>
-            <div className="text-text-secondary">
-              <p className="mb-4">Configure project parameters and luminaire specifications.</p>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-medium text-text-primary mb-4">Market Parameters</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Grid Factor (kgCO₂e/kWh)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={state.inputs.gridFactor}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_INPUT',
-                          field: 'gridFactor',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Electricity Rate ($/kWh)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={state.inputs.electricityRate}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_INPUT',
-                          field: 'electricityRate',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Project Life (years)
-                      </label>
-                      <input
-                        type="number"
-                        value={state.inputs.projectLife}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_INPUT',
-                          field: 'projectLife',
-                          value: parseInt(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium text-text-primary mb-4">Baseline Luminaire</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Wattage (W)
-                      </label>
-                      <input
-                        type="number"
-                        value={state.inputs.baseline.wattage}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'baseline',
-                          field: 'wattage',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={state.inputs.baseline.qty}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'baseline',
-                          field: 'qty',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        GWP (kgCO₂e/unit)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={state.inputs.baseline.gwp}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'baseline',
-                          field: 'gwp',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Cost ($)
-                      </label>
-                      <input
-                        type="number"
-                        value={state.inputs.baseline.cost}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'baseline',
-                          field: 'cost',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-medium text-text-primary mb-4">Proposed Luminaire</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Wattage (W)
-                      </label>
-                      <input
-                        type="number"
-                        value={state.inputs.proposed.wattage}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'proposed',
-                          field: 'wattage',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={state.inputs.proposed.qty}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'proposed',
-                          field: 'qty',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        GWP (kgCO₂e/unit)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        value={state.inputs.proposed.gwp}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'proposed',
-                          field: 'gwp',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-1">
-                        Cost ($)
-                      </label>
-                      <input
-                        type="number"
-                        value={state.inputs.proposed.cost}
-                        onChange={(e) => dispatch({
-                          type: 'UPDATE_LUMINAIRE_INPUT',
-                          luminaire: 'proposed',
-                          field: 'cost',
-                          value: parseFloat(e.target.value) || 0
-                        })}
-                        className="w-full px-3 py-2 border border-border rounded-md focus:ring-2 focus:ring-metric-blue focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className="space-y-lg">
+            <ProjectInputs />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+              <LuminaireInputs
+                title="Baseline System"
+                type="baseline"
+                icon="💡"
+                bgColor="bg-gray-600"
+              />
+              
+              <LuminaireInputs
+                title="Proposed System"
+                type="proposed"
+                icon="⚡"
+                bgColor="bg-metric-blue"
+              />
             </div>
           </div>
         );
