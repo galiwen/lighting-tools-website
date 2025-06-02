@@ -4,9 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luminaire GWP & Cost Assessment Tool</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
     <style>
+        :root {
+            /* Colors */
+            --color-bg-primary: #FAFBFC;
+            --color-bg-secondary: #FFFFFF;
+            --color-metric-green: #6B8E4E;
+            --color-metric-blue: #5B9BD5;
+            --color-metric-purple: #9B7EC7;
+            --color-metric-peach: #E8A87C;
+            --color-chart-primary: #E07B68;
+            --color-chart-trend: #2C3E50;
+            --color-text-primary: #1A202C;
+            --color-text-secondary: #718096;
+            --color-text-light: #A0AEC0;
+            --color-border: #E2E8F0;
+            --color-border-light: #F0F4F8;
+            --color-success: #48BB78;
+            --color-error: #F56565;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+            
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-base: 250ms ease;
+            --transition-slow: 350ms ease;
+        }
+        
         * { 
             margin: 0; 
             padding: 0; 
@@ -15,51 +58,65 @@
         }
         
         body { 
-            font-family: 'Noto Sans', sans-serif; 
-            background: #ffffff; 
-            color: #333333; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
             min-height: 100vh; 
             overflow-x: hidden;
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .container { 
             max-width: 1400px; 
             margin: 0 auto; 
-            padding: 20px;
+            padding: var(--space-lg);
+        }
+        
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: var(--space-xxl);
         }
         
         h1 { 
-            text-align: center; 
-            margin-bottom: 20px; 
             font-size: clamp(1.75rem, 5vw, 2.5rem); 
-            color: #1a1a1a;
+            color: var(--color-text-primary);
             font-weight: 700;
             line-height: 1.2;
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.02em;
         }
         
         .author-info {
-            text-align: center; 
-            color: #666666; 
-            font-size: clamp(0.8rem, 2vw, 0.9rem); 
-            margin-top: -15px; 
-            margin-bottom: 25px;
-            padding: 0 10px;
+            color: var(--color-text-secondary);
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            font-weight: 500;
         }
         
-        /* Mobile-optimized tabs */
+        .author-info a {
+            color: var(--color-metric-blue);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+        
+        .author-info a:hover {
+            color: var(--color-metric-green);
+        }
+        
+        /* Navigation Tabs */
         .tabs-container {
-            margin-bottom: 25px;
-            position: relative;
+            margin-bottom: var(--space-xl);
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-sm);
+            box-shadow: var(--shadow-sm);
         }
         
         .tabs { 
             display: flex; 
-            gap: 10px; 
-            background: #f5f5f5; 
-            padding: 10px; 
-            border-radius: 15px;
+            gap: var(--space-sm);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
@@ -72,18 +129,24 @@
         
         .tab { 
             flex: 0 0 auto;
-            padding: 12px 20px; 
-            background: #ffffff; 
-            border: 1px solid #e0e0e0; 
-            color: #333333; 
+            padding: var(--space-md) var(--space-lg);
+            background: transparent;
+            border: 2px solid transparent;
+            color: var(--color-text-secondary);
             cursor: pointer; 
-            border-radius: 10px; 
+            border-radius: var(--radius-md);
             font-size: clamp(0.875rem, 2vw, 1rem); 
             font-weight: 600;
-            transition: all 0.3s ease; 
+            transition: all var(--transition-base);
             white-space: nowrap;
             user-select: none;
             -webkit-user-select: none;
+            font-family: inherit;
+        }
+        
+        .tab:hover {
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
         }
         
         .tab:active { 
@@ -91,28 +154,10 @@
         }
         
         .tab.active { 
-            background: #2c3e50; 
-            color: #ffffff; 
-            border-color: #2c3e50;
-        }
-        
-        /* Scroll indicator for tabs */
-        @media (max-width: 768px) {
-            .tabs-container::after {
-                content: '›';
-                position: absolute;
-                right: 15px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 24px;
-                color: #999;
-                pointer-events: none;
-                opacity: 0.7;
-            }
-            
-            .tabs {
-                padding-right: 30px;
-            }
+            background: var(--color-chart-primary);
+            color: white;
+            border-color: var(--color-chart-primary);
+            box-shadow: var(--shadow-md);
         }
         
         .tab-content { 
@@ -129,209 +174,306 @@
             to { opacity: 1; transform: translateY(0); } 
         }
         
+        /* Metric Cards */
+        .metric-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .metric-card {
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .metric-card.green { background: var(--color-metric-green); color: white; }
+        .metric-card.blue { background: var(--color-metric-blue); color: white; }
+        .metric-card.purple { background: var(--color-metric-purple); color: white; }
+        .metric-card.peach { background: var(--color-metric-peach); color: white; }
+        
+        .metric-icon {
+            position: absolute;
+            top: var(--space-lg);
+            right: var(--space-lg);
+            width: 32px;
+            height: 32px;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .metric-value {
+            font-size: clamp(1.75rem, 4vw, 2.25rem);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .metric-subtitle {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+        
+        /* Sections */
         .section { 
-            background: #ffffff; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 15px; 
-            padding: clamp(15px, 3vw, 25px); 
-            margin-bottom: 20px; 
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+        }
+        
+        .section:hover {
+            box-shadow: var(--shadow-md);
         }
         
         .section h2 { 
-            color: #2c3e50; 
-            margin-bottom: 15px; 
-            font-size: clamp(1.2rem, 3vw, 1.5rem); 
-            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-lg);
+            font-size: clamp(1.25rem, 3vw, 1.5rem); 
+            font-weight: 700;
+            letter-spacing: -0.01em;
         }
         
         .section h3 { 
-            color: #2c3e50; 
-            margin-bottom: 10px; 
-            font-size: clamp(1rem, 2.5vw, 1.2rem); 
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-md);
+            font-size: clamp(1rem, 2.5vw, 1.125rem); 
             font-weight: 600;
         }
         
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); 
-            gap: 15px; 
+        .section p {
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            margin-bottom: var(--space-md);
         }
         
+        /* Grid Layout */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); 
+            gap: var(--space-lg);
+        }
+        
+        /* Form Elements */
         .input-group { 
-            margin-bottom: 15px; 
+            margin-bottom: var(--space-lg);
         }
         
         label { 
             display: block; 
-            margin-bottom: 5px; 
-            color: #666666; 
-            font-size: clamp(0.85rem, 2vw, 0.9rem); 
+            margin-bottom: var(--space-sm);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
             font-weight: 600;
+            letter-spacing: -0.01em;
         }
         
         input[type="number"], 
         input[type="text"], 
         select { 
             width: 100%; 
-            padding: 12px; 
-            background: #f8f8f8; 
-            border: 1px solid #d0d0d0; 
-            border-radius: 8px; 
-            color: #333333; 
-            font-size: 16px; /* Prevent zoom on iOS */
-            font-family: 'Noto Sans', sans-serif;
-            transition: all 0.3s ease;
+            padding: var(--space-md);
+            background: var(--color-bg-primary);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all var(--transition-fast);
             -webkit-appearance: none;
             appearance: none;
+        }
+        
+        input[type="number"]:hover, 
+        input[type="text"]:hover, 
+        select:hover {
+            border-color: var(--color-text-light);
+            background: var(--color-bg-secondary);
         }
         
         input[type="number"]:focus, 
         input[type="text"]:focus, 
         select:focus { 
             outline: none; 
-            border-color: #2c3e50; 
-            background: #ffffff;
-            box-shadow: 0 0 5px rgba(44, 62, 80, 0.2); 
+            border-color: var(--color-chart-primary);
+            background: var(--color-bg-secondary);
+            box-shadow: 0 0 0 3px rgba(224, 123, 104, 0.1);
         }
         
         input[readonly] {
-            background: #f0f0f0 !important;
+            background: var(--color-border-light) !important;
             cursor: not-allowed;
-            color: #666666;
+            color: var(--color-text-secondary);
+            opacity: 0.7;
         }
         
+        /* Buttons */
         .button { 
-            background: #2c3e50; 
-            color: #ffffff; 
+            background: var(--color-chart-primary);
+            color: white;
             border: none; 
-            padding: 14px 30px; 
-            border-radius: 25px; 
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
             font-size: clamp(0.95rem, 2.5vw, 1rem); 
             font-weight: 600; 
-            font-family: 'Noto Sans', sans-serif;
+            font-family: inherit;
             cursor: pointer; 
-            transition: all 0.3s ease; 
-            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.2);
+            transition: all var(--transition-base);
             width: 100%;
-            max-width: 300px;
+            max-width: 320px;
             margin: 0 auto;
             display: block;
             touch-action: manipulation;
+            letter-spacing: -0.01em;
+        }
+        
+        .button:hover {
+            background: #D66855;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         
         .button:active { 
-            transform: scale(0.98);
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
         }
         
+        /* Results Grid */
         .results-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); 
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); 
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
         }
         
         .result-card { 
-            background: #f8f8f8; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 12px; 
-            padding: 20px; 
+            background: var(--color-bg-primary);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
             text-align: center; 
-            transition: all 0.3s ease; 
+            transition: all var(--transition-base);
+        }
+        
+        .result-card:hover {
+            border-color: var(--color-chart-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
         }
         
         .result-card h3 { 
-            color: #2c3e50; 
-            margin-bottom: 15px; 
-            font-size: clamp(1rem, 2.5vw, 1.1rem); 
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-md);
+            font-size: clamp(1rem, 2.5vw, 1.125rem); 
             font-weight: 600;
         }
         
         .result-value { 
-            font-size: clamp(1.5rem, 4vw, 2rem); 
+            font-size: clamp(1.75rem, 4vw, 2.25rem); 
             font-weight: 700; 
-            color: #27ae60; 
-            margin-bottom: 5px; 
+            color: var(--color-metric-green);
+            margin-bottom: var(--space-xs);
         }
         
         .result-unit { 
-            color: #666666; 
-            font-size: clamp(0.85rem, 2vw, 0.9rem); 
+            color: var(--color-text-secondary);
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            font-weight: 500;
         }
         
-        /* Mobile-optimized tables */
+        /* Tables */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            margin: 0 -10px;
-            padding: 0 10px;
+            margin: 0 calc(var(--space-lg) * -1);
+            padding: 0 var(--space-lg);
         }
         
         .comparison-table { 
             width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: var(--space-lg);
             min-width: 600px;
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
         
         .comparison-table th, 
         .comparison-table td { 
-            padding: 10px 8px; 
+            padding: var(--space-md);
             text-align: left; 
-            border-bottom: 1px solid #e0e0e0;
-            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            border-bottom: 1px solid var(--color-border);
+            font-size: clamp(0.875rem, 2vw, 0.95rem);
         }
         
         .comparison-table th { 
-            background: #f5f5f5; 
-            color: #2c3e50; 
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
             font-weight: 600;
             position: sticky;
-            left: 0;
+            top: 0;
             z-index: 1;
         }
         
-        .comparison-table tr:hover { 
-            background: #f8f8f8; 
+        .comparison-table tr:hover td { 
+            background: var(--color-bg-primary);
         }
         
-        @media (max-width: 768px) {
-            .table-wrapper {
-                box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.1);
-            }
-            
-            .table-wrapper::after {
-                content: '→ Scroll';
-                position: absolute;
-                right: 10px;
-                top: 10px;
-                font-size: 12px;
-                color: #999;
-                background: rgba(255,255,255,0.9);
-                padding: 2px 8px;
-                border-radius: 4px;
-            }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
         }
         
-        .positive { color: #27ae60; }
-        .negative { color: #e74c3c; }
+        .positive { color: var(--color-success); font-weight: 600; }
+        .negative { color: var(--color-error); font-weight: 600; }
         
+        /* Charts */
         .chart-container { 
             position: relative; 
             height: clamp(300px, 50vw, 400px);
-            margin: 20px 0; 
-            background: #ffffff;
-            border-radius: 8px;
-            padding: 10px;
+            margin: var(--space-lg) 0; 
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
         }
         
+        /* Loading State */
         .loading { 
             display: inline-block; 
-            width: 20px; 
-            height: 20px; 
-            border: 3px solid rgba(44, 62, 80, 0.3); 
+            width: 24px; 
+            height: 24px; 
+            border: 3px solid var(--color-border);
             border-radius: 50%; 
-            border-top-color: #2c3e50; 
+            border-top-color: var(--color-chart-primary);
             animation: spin 1s ease-in-out infinite; 
         }
         
@@ -339,17 +481,35 @@
             to { transform: rotate(360deg); } 
         }
         
-        p {
-            color: #666666;
-            line-height: 1.6;
-            font-size: clamp(0.875rem, 2vw, 1rem);
+        /* Info Boxes */
+        .info-box {
+            background: rgba(107, 142, 78, 0.1);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            border: 2px solid rgba(107, 142, 78, 0.2);
         }
         
-        strong {
-            color: #333333;
+        .info-box p {
+            color: var(--color-metric-green);
+            margin: 0;
+            font-weight: 500;
         }
         
-        /* Mobile-optimized modal */
+        .note-box {
+            margin-top: var(--space-lg);
+            padding: var(--space-lg);
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--color-border);
+        }
+        
+        .note-box p {
+            font-size: clamp(0.875rem, 2vw, 0.95rem);
+            margin: 0;
+        }
+        
+        /* Modal */
         #welcomeModal {
             display: none; 
             position: fixed; 
@@ -358,70 +518,84 @@
             top: 0; 
             width: 100%; 
             height: 100%; 
-            background-color: rgba(0,0,0,0.5); 
+            background-color: rgba(0, 0, 0, 0.6);
             animation: fadeIn 0.3s ease;
-            padding: 20px;
+            padding: var(--space-lg);
             overflow-y: auto;
+            backdrop-filter: blur(4px);
         }
         
         .modal-content {
-            background-color: #ffffff; 
+            background-color: var(--color-bg-secondary);
             margin: auto;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: clamp(20px, 4vw, 30px); 
-            border-radius: 15px; 
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            padding: var(--space-xxl);
+            border-radius: var(--radius-xl);
             width: 100%; 
-            max-width: 600px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            max-width: 640px; 
+            box-shadow: var(--shadow-lg);
             position: relative; 
             animation: slideIn 0.3s ease;
         }
         
         .modal-close {
             position: absolute; 
-            right: 15px; 
-            top: 15px; 
-            background: none; 
+            right: var(--space-lg);
+            top: var(--space-lg);
+            background: var(--color-bg-primary);
             border: none; 
             font-size: 24px; 
-            color: #999; 
+            color: var(--color-text-secondary);
             cursor: pointer; 
-            padding: 5px; 
-            width: 35px; 
-            height: 35px; 
-            line-height: 25px;
+            padding: var(--space-sm);
+            width: 40px; 
+            height: 40px; 
+            line-height: 24px;
             border-radius: 50%;
-            transition: all 0.2s ease;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .modal-close:hover {
-            background: #f0f0f0;
-            color: #666;
+            background: var(--color-chart-primary);
+            color: white;
+            transform: rotate(90deg);
         }
         
         .modal-content h2 {
-            color: #2c3e50; 
-            margin-bottom: 20px; 
-            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-lg);
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
         
         .modal-content h3 {
-            color: #2c3e50; 
-            font-size: clamp(1.1rem, 3vw, 1.2rem); 
-            margin-bottom: 10px; 
-            margin-top: 20px;
+            color: var(--color-text-primary);
+            font-size: clamp(1.125rem, 3vw, 1.25rem);
+            margin-bottom: var(--space-md);
+            margin-top: var(--space-lg);
+            font-weight: 600;
         }
         
         .modal-content ul, 
         .modal-content ol {
-            margin-left: 20px; 
-            margin-bottom: 15px;
+            margin-left: var(--space-lg);
+            margin-bottom: var(--space-md);
         }
         
         .modal-content li {
-            margin-bottom: 8px;
+            margin-bottom: var(--space-sm);
             font-size: clamp(0.875rem, 2vw, 1rem);
+            color: var(--color-text-secondary);
+        }
+        
+        .modal-content strong {
+            color: var(--color-text-primary);
+            font-weight: 600;
         }
         
         @keyframes slideIn {
@@ -429,116 +603,552 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
-        /* Info boxes */
-        .info-box {
-            background: #e8f5e9; 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-            border: 1px solid #c8e6c9;
-        }
-        
-        .info-box p {
-            color: #2e7d32; 
-            margin: 0;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-        }
-        
-        .note-box {
-            margin-top: 20px; 
-            padding: 15px; 
-            background: #f5f5f5; 
-            border-radius: 8px; 
-            border: 1px solid #e0e0e0;
-        }
-        
-        .note-box p {
-            font-size: clamp(0.85rem, 2vw, 0.9rem); 
-            margin: 0;
-        }
-        
-        /* Responsive utilities */
-        @media (max-width: 480px) {
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
             .container {
-                padding: 15px;
+                padding: var(--space-md);
             }
             
-            .tabs {
-                gap: 5px;
-                padding: 8px;
+            .tabs-container {
+                padding: var(--space-xs);
             }
             
             .tab {
-                padding: 10px 15px;
+                padding: var(--space-sm) var(--space-md);
                 font-size: 0.875rem;
             }
             
             .section {
-                padding: 15px;
+                padding: var(--space-lg);
             }
             
+            .metric-cards {
+                gap: var(--space-md);
+            }
+            
+            .modal-content {
+                padding: var(--space-lg);
+            }
+            
+            .table-wrapper::after {
+                content: '→ Scroll';
+                position: absolute;
+                right: var(--space-lg);
+                top: var(--space-md);
+                font-size: 0.75rem;
+                color: var(--color-text-light);
+                background: rgba(255, 255, 255, 0.9);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-sm);
+            }
+        }
+        
+        @media (max-width: 480px) {
             .grid {
-                gap: 10px;
+                gap: var(--space-md);
             }
             
             input[type="number"], 
             input[type="text"], 
             select {
-                padding: 10px;
+                padding: var(--space-sm) var(--space-md);
             }
             
             .button {
-                padding: 12px 25px;
-            }
-            
-            .comparison-table th,
-            .comparison-table td {
-                padding: 8px 5px;
-                font-size: 0.75rem;
+                padding: var(--space-sm) var(--space-lg);
             }
         }
         
-        /* Landscape mode adjustments */
-        @media (max-height: 500px) and (orientation: landscape) {
-            h1 {
-                margin-bottom: 10px;
+        /* Mode Toggle Buttons */
+        .mode-toggle {
+            padding: var(--space-sm) var(--space-lg);
+            border: 2px solid var(--color-border);
+            background: var(--color-bg-secondary);
+            color: var(--color-text-secondary);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-family: inherit;
+        }
+        
+        .mode-toggle:hover {
+            background: var(--color-bg-primary);
+            border-color: var(--color-chart-primary);
+            color: var(--color-text-primary);
+        }
+        
+        .mode-toggle.active {
+            background: var(--color-chart-primary);
+            border-color: var(--color-chart-primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Comparison Mode Styles */
+        .comparison-container {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-lg);
+            margin-top: var(--space-lg);
+        }
+        
+        .comparison-container.active {
+            display: grid;
+        }
+        
+        .scenario-panel {
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            background: var(--color-bg-secondary);
+        }
+        
+        .scenario-panel.current {
+            border-color: var(--color-metric-blue);
+        }
+        
+        .scenario-panel.alternative {
+            border-color: var(--color-metric-green);
+        }
+        
+        .scenario-header {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .scenario-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .scenario-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-md);
+            }
+            
+            .mode-toggle {
+                font-size: 0.75rem;
+                padding: var(--space-xs) var(--space-md);
+            }
+        }
+        
+        /* Educational Tooltips */
+        .help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: var(--color-metric-blue);
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: help;
+            margin-left: var(--space-xs);
+            position: relative;
+            transition: all var(--transition-fast);
+        }
+        
+        .help-icon:hover {
+            background: var(--color-metric-green);
+            transform: scale(1.1);
+        }
+        
+        .tooltip {
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--color-text-primary);
+            color: white;
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            line-height: 1.4;
+            width: 280px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: var(--color-text-primary);
+        }
+        
+        .help-icon:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .tooltip .industry-range {
+            background: rgba(255,255,255,0.1);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            margin-top: var(--space-xs);
+            font-size: 0.8125rem;
+        }
+        
+        .tooltip .impact-indicator {
+            color: var(--color-metric-green);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .tooltip {
+                width: 240px;
+                font-size: 0.8125rem;
+                padding: var(--space-sm);
+            }
+        }
+        
+        /* Calculation Breakdown Styles */
+        .calculation-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xl);
+        }
+        
+        .calc-section {
+            background: var(--color-bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            border: 1px solid var(--color-border);
+        }
+        
+        .calc-formula {
+            background: var(--color-bg-primary);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+            border-left: 4px solid var(--color-metric-green);
+        }
+        
+        .calc-details {
+            display: grid;
+            gap: var(--space-sm);
+        }
+        
+        .calc-step {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(255,255,255,0.5);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border-light);
+        }
+        
+        .calc-step-label {
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+        
+        .calc-step-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-weight: 600;
+            color: var(--color-metric-blue);
+        }
+        
+        .assumptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+        }
+        
+        .assumption-item {
+            background: rgba(255,255,255,0.5);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border-light);
+        }
+        
+        .assumption-item code {
+            display: block;
+            background: var(--color-text-primary);
+            color: white;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            margin-top: var(--space-xs);
+        }
+        
+        @media (max-width: 768px) {
+            .assumptions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calc-step {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-xs);
+            }
+        }
+        
+        /* Preset Scenarios Styles */
+        .preset-scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .scenario-card {
+            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scenario-card:hover {
+            border-color: var(--color-metric-blue);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .scenario-card:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .scenario-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            flex-shrink: 0;
+        }
+        
+        .scenario-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .scenario-content h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .scenario-content p {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: var(--space-sm);
+            line-height: 1.4;
+        }
+        
+        .scenario-metrics {
+            display: flex;
+            gap: var(--space-md);
+        }
+        
+        .scenario-metrics span {
+            background: var(--color-metric-blue);
+            color: white;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .preset-scenarios {
+                grid-template-columns: 1fr;
+                gap: var(--space-md);
+            }
+            
+            .scenario-card {
+                padding: var(--space-md);
+                gap: var(--space-sm);
+            }
+            
+            .scenario-icon {
+                width: 50px;
+                height: 50px;
                 font-size: 1.5rem;
             }
             
-            .author-info {
-                margin-bottom: 15px;
+            .scenario-content h3 {
+                font-size: 1rem;
             }
             
-            .section {
-                margin-bottom: 15px;
-                padding: 15px;
+            .scenario-metrics {
+                flex-wrap: wrap;
+                gap: var(--space-xs);
+            }
+        }
+        
+        /* Comparison Metrics Styles */
+        .comparison-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--space-md);
+            padding: var(--space-md);
+        }
+        
+        .comparison-metric {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border-light);
+        }
+        
+        .comparison-metric .metric-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-xs);
+            font-weight: 500;
+        }
+        
+        .comparison-metric .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-metrics {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-sm);
+                padding: var(--space-sm);
             }
             
-            .chart-container {
-                height: 250px;
+            .comparison-metric {
+                padding: var(--space-sm);
+            }
+            
+            .comparison-metric .metric-value {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Export Button Styles */
+        .export-btn {
+            padding: var(--space-md) var(--space-lg);
+            border: 2px solid;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .export-pdf {
+            background: var(--color-error);
+            border-color: var(--color-error);
+            color: white;
+        }
+        
+        .export-pdf:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .export-csv {
+            background: var(--color-success);
+            border-color: var(--color-success);
+            color: white;
+        }
+        
+        .export-csv:hover {
+            background: #059669;
+            border-color: #059669;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .export-json {
+            background: var(--color-metric-blue);
+            border-color: var(--color-metric-blue);
+            color: white;
+        }
+        
+        .export-json:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        @media (max-width: 768px) {
+            .export-btn {
+                padding: var(--space-sm) var(--space-md);
+                font-size: 0.8125rem;
+                flex: 1;
+                min-width: 0;
+                justify-content: center;
             }
         }
         
         /* Touch-friendly adjustments */
         @media (hover: none) and (pointer: coarse) {
             .tab:hover {
-                background: #ffffff;
-                transform: none;
-                box-shadow: none;
+                background: transparent;
+                color: var(--color-text-secondary);
             }
             
             .tab.active {
-                background: #2c3e50;
+                background: var(--color-chart-primary);
             }
             
             .button:hover {
-                background: #2c3e50;
+                background: var(--color-chart-primary);
                 transform: none;
+                box-shadow: none;
             }
             
             .result-card:hover {
                 transform: none;
                 box-shadow: none;
+                border-color: var(--color-border);
+            }
+            
+            .metric-card:hover {
+                transform: none;
+                box-shadow: var(--shadow-sm);
+            }
+            
+            .section:hover {
+                box-shadow: var(--shadow-sm);
             }
         }
     </style>
@@ -551,8 +1161,8 @@
             
             <h2>Welcome to the Luminaire GWP & Cost Assessment Tool</h2>
             
-            <div style="color: #333333; line-height: 1.6;">
-                <p style="margin-bottom: 15px;">
+            <div style="color: var(--color-text-secondary); line-height: 1.6;">
+                <p style="margin-bottom: var(--space-md);">
                     This tool helps lighting professionals evaluate the environmental and financial impacts of different luminaire options over their lifecycle, comparing Global Warming Potential (GWP) and total costs.
                 </p>
                 
@@ -572,12 +1182,12 @@
                     <li>Navigate between tabs to explore different aspects of the comparison</li>
                 </ol>
                 
-                <p style="margin-top: 20px; font-style: italic; color: #666666; font-size: clamp(0.8rem, 2vw, 0.9rem);">
+                <p style="margin-top: var(--space-lg); font-style: italic; color: var(--color-text-light); font-size: clamp(0.8rem, 2vw, 0.9rem);">
                     Note: The tool automatically adjusts quantities based on maintenance factors (L70/L90) to ensure equivalent light output throughout the project lifetime.
                 </p>
             </div>
             
-            <button onclick="closeWelcomeModal()" class="button" style="margin-top: 20px;">
+            <button onclick="closeWelcomeModal()" class="button" style="margin-top: var(--space-xl);">
                 Get Started
             </button>
         </div>
@@ -602,10 +1212,12 @@
     </script>
     
     <div class="container">
-        <h1>Luminaire GWP & Cost Assessment Tool</h1>
-        <p class="author-info">
-            Developed by Dimitrios Tsiokaras - <a href="mailto:dimitrios@electrolight.com" style="color: #2c3e50;">dimitrios@electrolight.com</a>
-        </p>
+        <div class="header">
+            <h1>Luminaire GWP & Cost Assessment Tool</h1>
+            <p class="author-info">
+                Developed by Dimitrios Tsiokaras - <a href="mailto:dimitrios@electrolight.com">dimitrios@electrolight.com</a>
+            </p>
+        </div>
         
         <div class="tabs-container">
             <div class="tabs">
@@ -613,16 +1225,130 @@
                 <button class="tab" onclick="window.showTab('l70vsl90', event)">L70 vs L90</button>
                 <button class="tab" onclick="window.showTab('gwp', event)">GWP Analysis</button>
                 <button class="tab" onclick="window.showTab('financial', event)">Financial</button>
+                <button class="tab" onclick="window.showTab('calculations', event)">Calculation Details</button>
             </div>
         </div>
         
         <!-- Data Entry Tab -->
         <div id="input" class="tab-content active">
+            <!-- Metric Cards for Data Entry -->
+            <div class="metric-cards">
+                <div class="metric-card green">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-label">Total Luminaires</div>
+                    <div class="metric-value" id="totalLuminaires">973</div>
+                    <div class="metric-subtitle">Across all projects</div>
+                </div>
+                <div class="metric-card blue">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-label">Project Duration</div>
+                    <div class="metric-value" id="projectDuration">15</div>
+                    <div class="metric-subtitle">Years</div>
+                </div>
+                <div class="metric-card purple">
+                    <div class="metric-icon">🌍</div>
+                    <div class="metric-label">Grid Emissions</div>
+                    <div class="metric-value" id="gridEmissions">0.39</div>
+                    <div class="metric-subtitle">kg CO2e/kWh</div>
+                </div>
+            </div>
+            
+            <!-- Comparison Mode Toggle -->
+            <div class="section">
+                <h2>Analysis Mode</h2>
+                <div style="display: flex; gap: var(--space-md); align-items: center; margin-bottom: var(--space-lg);">
+                    <label style="font-weight: 600; color: var(--color-text-primary);">Mode:</label>
+                    <div style="display: flex; gap: var(--space-sm);">
+                        <button type="button" id="singleModeBtn" class="mode-toggle active" onclick="switchAnalysisMode('single')">
+                            Single Analysis
+                        </button>
+                        <button type="button" id="comparisonModeBtn" class="mode-toggle" onclick="switchAnalysisMode('comparison')">
+                            Compare Scenarios
+                        </button>
+                    </div>
+                </div>
+                <div id="modeDescription" style="padding: var(--space-md); background: var(--color-bg-primary); border-radius: var(--radius-sm); margin-bottom: var(--space-lg);">
+                    <strong>Single Analysis:</strong> Compare baseline vs proposed luminaire in current scenario
+                </div>
+            </div>
+            
+            <!-- Preset Scenarios Section -->
+            <div class="section">
+                <h2>Quick Start Scenarios</h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">
+                    Load professionally validated scenarios to get started quickly
+                </p>
+                
+                <div class="preset-scenarios">
+                    <div class="scenario-card" onclick="loadPresetScenario('efficient')">
+                        <div class="scenario-icon">⚡</div>
+                        <div class="scenario-content">
+                            <h3>High Efficiency LED</h3>
+                            <p>Best-in-class LED with advanced controls</p>
+                            <div class="scenario-metrics">
+                                <span>7W → 15W</span>
+                                <span>100k hrs</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-card" onclick="loadPresetScenario('balanced')">
+                        <div class="scenario-icon">⚖️</div>
+                        <div class="scenario-content">
+                            <h3>Balanced Performance</h3>
+                            <p>Good efficiency with moderate cost</p>
+                            <div class="scenario-metrics">
+                                <span>9W → 12W</span>
+                                <span>45k hrs</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-card" onclick="loadPresetScenario('budget')">
+                        <div class="scenario-icon">💰</div>
+                        <div class="scenario-content">
+                            <h3>Budget Option</h3>
+                            <p>Cost-effective with standard performance</p>
+                            <div class="scenario-metrics">
+                                <span>14W → 18W</span>
+                                <span>40k hrs</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-card" onclick="loadPresetScenario('retrofit')">
+                        <div class="scenario-icon">🔄</div>
+                        <div class="scenario-content">
+                            <h3>Retrofit Analysis</h3>
+                            <p>Fluorescent to LED conversion</p>
+                            <div class="scenario-metrics">
+                                <span>18W → 32W</span>
+                                <span>50k hrs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="section">
                 <h2>Market Data</h2>
                 <div class="grid">
                     <div class="input-group">
-                        <label>CO2e Grid Factor (kg/kWh)</label>
+                        <label>CO2e Grid Factor (kg/kWh)
+                            <span class="help-icon">?
+                                <div class="tooltip">
+                                    CO2 emissions per kWh of electricity in your region
+                                    <div class="industry-range">
+                                        <strong>Typical ranges:</strong><br>
+                                        • US Average: 0.39 kg/kWh<br>
+                                        • California: 0.21 kg/kWh<br>
+                                        • Texas: 0.43 kg/kWh<br>
+                                        • Norway: 0.02 kg/kWh
+                                    </div>
+                                    Lower values = cleaner grid, greater savings from efficiency
+                                </div>
+                            </span>
+                        </label>
                         <input type="number" id="gridFactor" value="0.39" step="0.01">
                     </div>
                     <div class="input-group">
@@ -632,6 +1358,23 @@
                     <div class="input-group">
                         <label>Average Inflation Rate</label>
                         <input type="number" id="inflationRate" value="0.03" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>Grid Decarbonization Rate (Annual)
+                            <span class="help-icon">?
+                                <div class="tooltip">
+                                    Annual reduction in grid carbon intensity as renewable energy increases
+                                    <div class="industry-range">
+                                        <strong>Typical ranges:</strong><br>
+                                        • Conservative: 2% per year<br>
+                                        • Moderate: 3-4% per year<br>
+                                        • Aggressive: 5%+ per year
+                                    </div>
+                                    <span class="impact-indicator">Higher rates = greater long-term GWP savings</span>
+                                </div>
+                            </span>
+                        </label>
+                        <input type="number" id="decarbonizationRate" value="0.03" step="0.01" min="0" max="0.10">
                     </div>
                 </div>
             </div>
@@ -670,7 +1413,20 @@
                 <h2>Baseline Luminaire (A)</h2>
                 <div class="grid">
                     <div class="input-group">
-                        <label>Wattage (W)</label>
+                        <label>Wattage (W)
+                            <span class="help-icon">?
+                                <div class="tooltip">
+                                    Power consumption per luminaire
+                                    <div class="industry-range">
+                                        <strong>LED ranges:</strong><br>
+                                        • High-efficiency: 6-9W<br>
+                                        • Standard: 10-15W<br>
+                                        • Basic: 15-25W
+                                    </div>
+                                    Lower wattage = less energy consumption
+                                </div>
+                            </span>
+                        </label>
                         <input type="number" id="baselineWattage" value="12" step="0.1" onchange="window.updateEfficacy('baseline')">
                     </div>
                     <div class="input-group">
@@ -755,6 +1511,28 @@
         
         <!-- L70 vs L90 Comparison Tab -->
         <div id="l70vsl90" class="tab-content">
+            <!-- Metric Cards for L70 vs L90 -->
+            <div class="metric-cards">
+                <div class="metric-card peach">
+                    <div class="metric-icon">🔄</div>
+                    <div class="metric-label">Total GWP Difference A</div>
+                    <div class="metric-value" id="gwpDiffCardA">-</div>
+                    <div class="metric-subtitle">L90 vs L70</div>
+                </div>
+                <div class="metric-card blue">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-label">Total GWP Difference B</div>
+                    <div class="metric-value" id="gwpDiffCardB">-</div>
+                    <div class="metric-subtitle">L90 vs L70</div>
+                </div>
+                <div class="metric-card green">
+                    <div class="metric-icon">🔧</div>
+                    <div class="metric-label">Avg Replacements</div>
+                    <div class="metric-value" id="avgReplacements">-</div>
+                    <div class="metric-subtitle">Over project life</div>
+                </div>
+            </div>
+            
             <div class="section">
                 <h2>GWP L90 vs L70 Comparison</h2>
                 <p>Compares GWP components (kgCO2e) for each luminaire when considering L70 lifetime versus L90 lifetime. Quantities are adjusted based on maintenance factors (÷0.9 for L90, ÷0.7 for L70) to maintain equivalent light output.</p>
@@ -773,17 +1551,17 @@
                 <div class="results-grid">
                     <div class="result-card">
                         <h3>Luminaire A - Total GWP</h3>
-                        <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-around; margin-top: var(--space-md);">
                             <div>
-                                <div style="color: #666666; font-size: 0.9rem;">L90</div>
+                                <div style="color: var(--color-text-secondary); font-size: 0.9rem;">L90</div>
                                 <div class="result-value" id="gwpTotalA_L90" style="font-size: 1.5rem;">-</div>
                             </div>
                             <div>
-                                <div style="color: #666666; font-size: 0.9rem;">L70</div>
+                                <div style="color: var(--color-text-secondary); font-size: 0.9rem;">L70</div>
                                 <div class="result-value" id="gwpTotalA_L70" style="font-size: 1.5rem;">-</div>
                             </div>
                             <div>
-                                <div style="color: #666666; font-size: 0.9rem;">Diff</div>
+                                <div style="color: var(--color-text-secondary); font-size: 0.9rem;">Diff</div>
                                 <div class="result-value" id="gwpDiffA" style="font-size: 1.5rem;">-</div>
                             </div>
                         </div>
@@ -791,17 +1569,17 @@
                     </div>
                     <div class="result-card">
                         <h3>Luminaire B - Total GWP</h3>
-                        <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-around; margin-top: var(--space-md);">
                             <div>
-                                <div style="color: #666666; font-size: 0.9rem;">L90</div>
+                                <div style="color: var(--color-text-secondary); font-size: 0.9rem;">L90</div>
                                 <div class="result-value" id="gwpTotalB_L90" style="font-size: 1.5rem;">-</div>
                             </div>
                             <div>
-                                <div style="color: #666666; font-size: 0.9rem;">L70</div>
+                                <div style="color: var(--color-text-secondary); font-size: 0.9rem;">L70</div>
                                 <div class="result-value" id="gwpTotalB_L70" style="font-size: 1.5rem;">-</div>
                             </div>
                             <div>
-                                <div style="color: #666666; font-size: 0.9rem;">Diff</div>
+                                <div style="color: var(--color-text-secondary); font-size: 0.9rem;">Diff</div>
                                 <div class="result-value" id="gwpDiffB" style="font-size: 1.5rem;">-</div>
                             </div>
                         </div>
@@ -836,6 +1614,28 @@
         
         <!-- GWP Analysis Tab -->
         <div id="gwp" class="tab-content">
+            <!-- Metric Cards for GWP Analysis -->
+            <div class="metric-cards">
+                <div class="metric-card green">
+                    <div class="metric-icon">🌱</div>
+                    <div class="metric-label">Total Emissions</div>
+                    <div class="metric-value" id="totalEmissions">-</div>
+                    <div class="metric-subtitle">kg CO2e</div>
+                </div>
+                <div class="metric-card purple">
+                    <div class="metric-icon">📉</div>
+                    <div class="metric-label">Overall Reduction</div>
+                    <div class="metric-value" id="overallReduction">-</div>
+                    <div class="metric-subtitle">Proposed vs Baseline</div>
+                </div>
+                <div class="metric-card blue">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-label">Control Impact</div>
+                    <div class="metric-value" id="controlImpact">-</div>
+                    <div class="metric-subtitle">Additional savings</div>
+                </div>
+            </div>
+            
             <div class="section">
                 <h2>GWP Lifecycle Analysis (L90 Baseline)</h2>
                 <p>Environmental impact using L90 lifetime with quantities adjusted by ÷0.9 maintenance factor. The chart shows how different control strategies progressively reduce GWP across all lifecycle stages.</p>
@@ -850,13 +1650,13 @@
                 <div class="results-grid">
                     <div class="result-card">
                         <h3>Overall GWP Reduction</h3>
-                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">Proposed vs Baseline (No Controls)</div>
+                        <div style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-sm);">Proposed vs Baseline (No Controls)</div>
                         <div class="result-value" id="gwpReduction">-</div>
                         <div class="result-unit">% reduction</div>
                     </div>
                     <div class="result-card">
                         <h3>Maximum GWP Reduction</h3>
-                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">With All Control Strategies</div>
+                        <div style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-sm);">With All Control Strategies</div>
                         <div class="result-value" id="gwpMaxReduction">-</div>
                         <div class="result-unit">% reduction</div>
                     </div>
@@ -910,6 +1710,28 @@
         
         <!-- Financial Analysis Tab -->
         <div id="financial" class="tab-content">
+            <!-- Metric Cards for Financial Analysis -->
+            <div class="metric-cards">
+                <div class="metric-card green">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-label">Total Cost</div>
+                    <div class="metric-value" id="totalCostMetric">-</div>
+                    <div class="metric-subtitle">Project lifetime</div>
+                </div>
+                <div class="metric-card blue">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-label">Cost Savings</div>
+                    <div class="metric-value" id="costSavingsMetric">-</div>
+                    <div class="metric-subtitle">Proposed vs Baseline</div>
+                </div>
+                <div class="metric-card purple">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-label">Annual Savings</div>
+                    <div class="metric-value" id="annualSavingsMetric">-</div>
+                    <div class="metric-subtitle">Operating costs</div>
+                </div>
+            </div>
+            
             <div class="section">
                 <h2>Total Cost Analysis (L90 Baseline)</h2>
                 <p>Financial analysis using L90 lifetime with quantities adjusted by ÷0.9 maintenance factor. The chart shows total project costs including initial investment, replacements, and operational expenses.</p>
@@ -924,13 +1746,13 @@
                 <div class="results-grid">
                     <div class="result-card">
                         <h3>Baseline Cost Savings</h3>
-                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">Proposed vs Baseline (No Controls)</div>
+                        <div style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-sm);">Proposed vs Baseline (No Controls)</div>
                         <div class="result-value" id="costSavings">-</div>
                         <div class="result-unit">% savings</div>
                     </div>
                     <div class="result-card">
                         <h3>Maximum Cost Savings</h3>
-                        <div style="color: #666666; font-size: 0.9rem; margin-bottom: 10px;">With All Control Strategies</div>
+                        <div style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: var(--space-sm);">With All Control Strategies</div>
                         <div class="result-value" id="maxCostSavings">-</div>
                         <div class="result-unit">% savings</div>
                     </div>
@@ -975,6 +1797,104 @@
                 </div>
             </div>
         </div>
+
+        <!-- Calculation Details Tab -->
+        <div id="calculations" class="tab-content">
+            <div class="section">
+                <h2>Calculation Transparency</h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: var(--space-lg);">
+                    Understanding how the environmental and financial impacts are calculated
+                </p>
+                
+                <div class="calculation-breakdown">
+                    <div class="calc-section">
+                        <h3 style="color: var(--color-metric-green); margin-bottom: var(--space-md);">
+                            GWP (Global Warming Potential) Calculation
+                        </h3>
+                        <div class="calc-formula">
+                            <strong>Total GWP = Manufacturing + Operations + End of Life</strong>
+                        </div>
+                        
+                        <div class="calc-details" id="gwpCalcDetails">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="calc-section">
+                        <h3 style="color: var(--color-metric-blue); margin-bottom: var(--space-md);">
+                            Financial Calculation
+                        </h3>
+                        <div class="calc-formula">
+                            <strong>Total Cost = Initial + Replacements + Operations</strong>
+                        </div>
+                        
+                        <div class="calc-details" id="costCalcDetails">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="calc-section">
+                        <h3 style="color: var(--color-metric-purple); margin-bottom: var(--space-md);">
+                            Key Assumptions & Formulas
+                        </h3>
+                        <div class="assumptions-grid">
+                            <div class="assumption-item">
+                                <strong>Grid Decarbonization:</strong>
+                                <code>Grid Factor × (1 - Rate)^Year</code>
+                            </div>
+                            <div class="assumption-item">
+                                <strong>Maintenance Dimming:</strong>
+                                <code>(1 - (1 - Factor) / 2)</code>
+                            </div>
+                            <div class="assumption-item">
+                                <strong>Replacement Timing:</strong>
+                                <code>Cost × (1 + Inflation)^Year</code>
+                            </div>
+                            <div class="assumption-item">
+                                <strong>L90/L70 Adjustment:</strong>
+                                <code>Quantity ÷ Maintenance Factor</code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="calc-section">
+                        <h3 style="color: var(--color-metric-peach); margin-bottom: var(--space-md);">
+                            Export Report
+                        </h3>
+                        <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+                            <button type="button" onclick="exportReport('pdf')" class="export-btn export-pdf">
+                                📄 Export PDF
+                            </button>
+                            <button type="button" onclick="exportReport('csv')" class="export-btn export-csv">
+                                📊 Export CSV
+                            </button>
+                            <button type="button" onclick="exportReport('json')" class="export-btn export-json">
+                                📋 Export Data
+                            </button>
+                        </div>
+                        <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-top: var(--space-md);">
+                            Generate professional reports for stakeholders or export data for further analysis
+                        </p>
+                    </div>
+                    
+                    <div class="calc-section">
+                        <h3 style="color: var(--color-metric-blue); margin-bottom: var(--space-md);">
+                            ⚙️ Settings & Preferences
+                        </h3>
+                        <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+                            <button type="button" onclick="createSettingsPanel()" class="export-btn" style="
+                                background: var(--color-primary); color: white; border: 1px solid var(--color-primary);
+                            ">
+                                ⚙️ Open Settings
+                            </button>
+                        </div>
+                        <p style="color: var(--color-text-secondary); font-size: 0.875rem; margin-top: var(--space-md);">
+                            Customize default values, chart display preferences, and data management options
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script type="text/javascript">(function() {
@@ -982,9 +1902,36 @@
         var gwpChartInstance = null;
         var financialChartInstance = null;
         
-        // Configure Chart.js defaults for mobile
+        // Configure Chart.js defaults
+        Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
         Chart.defaults.font.size = window.innerWidth < 768 ? 10 : 12;
         Chart.defaults.plugins.legend.labels.padding = window.innerWidth < 768 ? 10 : 15;
+        Chart.defaults.color = '#718096';
+        
+        // Update metric cards
+        function updateMetricCards() {
+            try {
+                // Data Entry metrics
+                var baselineQty = parseFloat(document.getElementById('baselineQty').value) || 0;
+                var proposedQty = parseFloat(document.getElementById('proposedQty').value) || 0;
+                var totalLumElement = document.getElementById('totalLuminaires');
+                if (totalLumElement) {
+                    totalLumElement.textContent = Math.round(baselineQty + proposedQty);
+                }
+                
+                var projectLifeElement = document.getElementById('projectDuration');
+                if (projectLifeElement) {
+                    projectLifeElement.textContent = document.getElementById('projectLife').value || '15';
+                }
+                
+                var gridEmissionsElement = document.getElementById('gridEmissions');
+                if (gridEmissionsElement) {
+                    gridEmissionsElement.textContent = document.getElementById('gridFactor').value || '0.39';
+                }
+            } catch (error) {
+                console.error('Error updating metric cards:', error);
+            }
+        }
         
         function formatNumber(num, decimals) {
             if (typeof decimals === 'undefined') decimals = 0;
@@ -1006,6 +1953,7 @@
                 if (efficacyInput) {
                     efficacyInput.value = efficacy;
                 }
+                updateMetricCards();
             } catch (error) {
                 console.error('Error updating efficacy:', error);
             }
@@ -1058,10 +2006,13 @@
         
         function calculateAll() {
             try {
+                updateMetricCards();
+                
                 var inputs = {
                     gridFactor: parseFloat(document.getElementById('gridFactor').value) || 0.39,
                     electricityRate: parseFloat(document.getElementById('electricityRate').value) || 0.26,
                     inflationRate: parseFloat(document.getElementById('inflationRate').value) || 0.03,
+                    decarbonizationRate: parseFloat(document.getElementById('decarbonizationRate').value) || 0.03,
                     controlCoeff: parseFloat(document.getElementById('controlCoeff').value) || 0.75,
                     controlCostCoeff: parseFloat(document.getElementById('controlCostCoeff').value) || 1.15,
                     operationalHours: parseFloat(document.getElementById('operationalHours').value) || 4990,
@@ -1122,6 +2073,11 @@
                 updateGWPResults(resultsL90, inputs, adjustedBaselineL90.qty, adjustedProposedL90.qty);
                 updateFinancialResults(resultsL90, inputs, adjustedBaselineL90.qty, adjustedProposedL90.qty);
                 updateL70vsL90Comparison(resultsL90, resultsL70, inputs);
+                updateCalculationBreakdown(resultsL90, inputs);
+                
+                // Phase 3: Create advanced interactive visualizations
+                createTimelineChart(resultsL90, inputs);
+                createSensitivityChart(inputs);
                 
             } catch (error) {
                 console.error('Error in calculateAll:', error);
@@ -1142,7 +2098,8 @@
                 
                 if (scenario === 'withMaintenance') {
                     var maintenanceFactor = lifetimeType === 'L90' ? inputs.l90Factor : inputs.l70Factor;
-                    maintenanceMultiplier = maintenanceFactor;
+                    // CORRECTED: Maintenance dimming formula per Excel model
+                    maintenanceMultiplier = (1 - (1 - maintenanceFactor) / 2);
                 }
                 
                 var lifetime = lifetimeType === 'L90' ? luminaire.l90Lifetime : luminaire.l70Lifetime;
@@ -1154,13 +2111,27 @@
                 
                 var totalEnergy = annualEnergy * inputs.projectLife;
                 
-                var operationalGWP = totalEnergy * inputs.gridFactor;
+                // CORRECTED: Grid decarbonization implementation
+                var operationalGWP = 0;
+                for (var year = 0; year < inputs.projectLife; year++) {
+                    var gridFactorForYear = inputs.gridFactor * Math.pow(1 - (inputs.decarbonizationRate || 0), year);
+                    operationalGWP += annualEnergy * gridFactorForYear;
+                }
                 var embodiedGWP = luminaire.gwp * luminaire.qty * (1 + replacements);
                 var eolGWP = luminaire.eol * luminaire.qty * (1 + replacements);
                 var totalGWP = operationalGWP + embodiedGWP + eolGWP;
                 
                 var initialCost = luminaire.cost * luminaire.qty * costMultiplier;
-                var replacementCost = luminaire.cost * luminaire.qty * replacements * costMultiplier;
+                // CORRECTED: Replacement cost timing with inflation
+                var replacementCost = 0;
+                if (replacements > 0 && lifetimeYears > 0) {
+                    for (var rep = 1; rep <= replacements; rep++) {
+                        var replacementYear = Math.floor(rep * lifetimeYears);
+                        var inflatedCost = luminaire.cost * luminaire.qty * costMultiplier * 
+                                         Math.pow(1 + inputs.inflationRate, replacementYear);
+                        replacementCost += inflatedCost;
+                    }
+                }
                 var annualOperatingCost = annualEnergy * inputs.electricityRate;
                 
                 var totalOperatingCost = 0;
@@ -1215,6 +2186,25 @@
                 var proposedGWPMax = results.withMaintenance.proposed.totalGWP;
                 var gwpMaxReduction = baselineGWP > 0 ? ((baselineGWP - proposedGWPMax) / baselineGWP * 100).toFixed(1) : '0';
                 
+                // Update metric cards
+                var totalEmissionsEl = document.getElementById('totalEmissions');
+                if (totalEmissionsEl) {
+                    totalEmissionsEl.textContent = formatNumber(Math.round(proposedGWP));
+                }
+                
+                var overallReductionEl = document.getElementById('overallReduction');
+                if (overallReductionEl) {
+                    overallReductionEl.textContent = gwpReduction + '%';
+                }
+                
+                var controlImpactEl = document.getElementById('controlImpact');
+                if (controlImpactEl) {
+                    var controlReduction = baselineGWP > 0 ? 
+                        ((results.without.baseline.totalGWP - results.withMaintenance.baseline.totalGWP) / 
+                         results.without.baseline.totalGWP * 100).toFixed(1) : '0';
+                    controlImpactEl.textContent = controlReduction + '%';
+                }
+                
                 var gwpReductionElement = document.getElementById('gwpReduction');
                 var gwpMaxReductionElement = document.getElementById('gwpMaxReduction');
                 
@@ -1238,7 +2228,7 @@
                     tbody.innerHTML = '';
                     
                     var headerRow = tbody.insertRow();
-                    headerRow.innerHTML = '<td colspan="5" style="text-align: center; color: #27ae60; padding: 10px;">' +
+                    headerRow.innerHTML = '<td colspan="5" style="text-align: center; color: var(--color-metric-green); padding: var(--space-md);">' +
                         '<strong>Adjusted Quantities:</strong> Baseline A: ' + formatNumber(adjustedBaselineQty, 1) + 
                         ' units | Proposed B: ' + formatNumber(adjustedProposedQty, 1) + ' units</td>';
                     
@@ -1277,6 +2267,23 @@
                 var proposedCostMax = results.withMaintenance.proposed.totalCost;
                 var maxCostSavings = baselineCost > 0 ? ((baselineCost - proposedCostMax) / baselineCost * 100).toFixed(1) : '0';
                 
+                // Update metric cards
+                var totalCostEl = document.getElementById('totalCostMetric');
+                if (totalCostEl) {
+                    totalCostEl.textContent = '$' + formatNumber(Math.round(proposedCost));
+                }
+                
+                var costSavingsMetricEl = document.getElementById('costSavingsMetric');
+                if (costSavingsMetricEl) {
+                    costSavingsMetricEl.textContent = costSavings + '%';
+                }
+                
+                var annualSavingsEl = document.getElementById('annualSavingsMetric');
+                if (annualSavingsEl) {
+                    var annualSaving = results.without.baseline.annualOperatingCost - results.without.proposed.annualOperatingCost;
+                    annualSavingsEl.textContent = '$' + formatNumber(Math.round(annualSaving));
+                }
+                
                 var costSavingsElement = document.getElementById('costSavings');
                 var maxCostSavingsElement = document.getElementById('maxCostSavings');
                 
@@ -1300,7 +2307,7 @@
                     tbody.innerHTML = '';
                     
                     var headerRow = tbody.insertRow();
-                    headerRow.innerHTML = '<td colspan="5" style="text-align: center; color: #27ae60; padding: 10px;">' +
+                    headerRow.innerHTML = '<td colspan="5" style="text-align: center; color: var(--color-metric-green); padding: var(--space-md);">' +
                         '<strong>Adjusted Quantities:</strong> Baseline A: ' + formatNumber(adjustedBaselineQty, 1) + 
                         ' units | Proposed B: ' + formatNumber(adjustedProposedQty, 1) + ' units</td>';
                     
@@ -1357,6 +2364,29 @@
                 var baseL70A = calculateLuminaire(inputs, adjustedBaselineL70, 'without', 'L70');
                 var baseL90B = calculateLuminaire(inputs, adjustedProposedL90, 'without', 'L90');
                 var baseL70B = calculateLuminaire(inputs, adjustedProposedL70, 'without', 'L70');
+                
+                // Update metric cards
+                var gwpDiffCardAEl = document.getElementById('gwpDiffCardA');
+                var gwpDiffCardBEl = document.getElementById('gwpDiffCardB');
+                var avgReplacementsEl = document.getElementById('avgReplacements');
+                
+                if (gwpDiffCardAEl) {
+                    var diffA = baseL70A.totalGWP > 0 ? 
+                        ((baseL90A.totalGWP - baseL70A.totalGWP) / baseL70A.totalGWP * 100).toFixed(1) : '0';
+                    gwpDiffCardAEl.textContent = diffA + '%';
+                }
+                
+                if (gwpDiffCardBEl) {
+                    var diffB = baseL70B.totalGWP > 0 ? 
+                        ((baseL90B.totalGWP - baseL70B.totalGWP) / baseL70B.totalGWP * 100).toFixed(1) : '0';
+                    gwpDiffCardBEl.textContent = diffB + '%';
+                }
+                
+                if (avgReplacementsEl) {
+                    var avgRepl = ((baseL90A.replacements + baseL70A.replacements + 
+                                   baseL90B.replacements + baseL70B.replacements) / 4).toFixed(1);
+                    avgReplacementsEl.textContent = avgRepl;
+                }
                 
                 var gwpTotalA_L90 = document.getElementById('gwpTotalA_L90');
                 var gwpTotalA_L70 = document.getElementById('gwpTotalA_L70');
@@ -1481,23 +2511,26 @@
                             {
                                 label: 'Manufacturing (A)',
                                 data: manufacturingData,
-                                backgroundColor: 'rgba(255, 159, 64, 0.8)',
-                                borderColor: 'rgba(255, 159, 64, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#FF9B71',
+                                borderColor: '#FF8659',
+                                borderWidth: 0,
+                                borderRadius: 4
                             },
                             {
                                 label: 'Operations (B)',
                                 data: operationsData,
-                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#5B9BD5',
+                                borderColor: '#4A8BC4',
+                                borderWidth: 0,
+                                borderRadius: 4
                             },
                             {
                                 label: 'End of Life (C)',
                                 data: eolData,
-                                backgroundColor: 'rgba(75, 192, 192, 0.8)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#70C1B3',
+                                borderColor: '#5FB0A2',
+                                borderWidth: 0,
+                                borderRadius: 4
                             }
                         ]
                     },
@@ -1508,10 +2541,10 @@
                             title: {
                                 display: true,
                                 text: 'GWP L90 vs L70 Comparison',
-                                color: '#333333',
+                                color: '#1A202C',
                                 font: { 
                                     size: window.innerWidth < 768 ? 14 : 20, 
-                                    weight: 'bold' 
+                                    weight: '700' 
                                 },
                                 padding: {
                                     top: 10,
@@ -1521,13 +2554,24 @@
                             legend: {
                                 position: 'top',
                                 labels: { 
-                                    color: '#333333',
+                                    color: '#718096',
                                     padding: window.innerWidth < 768 ? 10 : 15,
-                                    font: { size: window.innerWidth < 768 ? 10 : 12 },
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 12,
+                                        weight: '500'
+                                    },
                                     boxWidth: window.innerWidth < 768 ? 15 : 40
                                 }
                             },
                             tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1A202C',
+                                bodyColor: '#718096',
+                                borderColor: '#E2E8F0',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                titleFont: { weight: '600' },
                                 mode: 'index',
                                 intersect: false,
                                 callbacks: {
@@ -1559,27 +2603,42 @@
                             x: {
                                 stacked: true,
                                 ticks: { 
-                                    color: '#666666',
-                                    font: { size: window.innerWidth < 768 ? 10 : 11 }
+                                    color: '#718096',
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 11,
+                                        weight: '500'
+                                    }
                                 },
-                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                                grid: { 
+                                    color: '#F0F4F8',
+                                    borderColor: '#E2E8F0'
+                                }
                             },
                             y: {
                                 stacked: true,
                                 beginAtZero: true,
                                 ticks: { 
-                                    color: '#666666',
+                                    color: '#718096',
                                     callback: function(value) {
                                         return formatNumber(value);
                                     },
-                                    font: { size: window.innerWidth < 768 ? 10 : 11 }
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 11,
+                                        weight: '500'
+                                    }
                                 },
-                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                grid: { 
+                                    color: '#F0F4F8',
+                                    borderColor: '#E2E8F0'
+                                },
                                 title: {
                                     display: true,
                                     text: 'GWP (kgCO2e)',
-                                    color: '#666666',
-                                    font: { size: window.innerWidth < 768 ? 10 : 12 }
+                                    color: '#718096',
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 12,
+                                        weight: '600'
+                                    }
                                 }
                             }
                         }
@@ -1642,23 +2701,26 @@
                             {
                                 label: 'Manufacturing (A)',
                                 data: manufacturingData,
-                                backgroundColor: 'rgba(255, 159, 64, 0.8)',
-                                borderColor: 'rgba(255, 159, 64, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#FF9B71',
+                                borderColor: '#FF8659',
+                                borderWidth: 0,
+                                borderRadius: 4
                             },
                             {
                                 label: 'Operations (B)',
                                 data: operationsData,
-                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#5B9BD5',
+                                borderColor: '#4A8BC4',
+                                borderWidth: 0,
+                                borderRadius: 4
                             },
                             {
                                 label: 'End of Life (C)',
                                 data: eolData,
-                                backgroundColor: 'rgba(75, 192, 192, 0.8)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#70C1B3',
+                                borderColor: '#5FB0A2',
+                                borderWidth: 0,
+                                borderRadius: 4
                             }
                         ]
                     },
@@ -1672,25 +2734,44 @@
                                     ['GWP Lifecycle Comparison (L90)', 
                                      'A: ' + formatNumber(adjustedBaselineQty, 0) + ' | B: ' + formatNumber(adjustedProposedQty, 0) + ' units'] :
                                     'GWP Lifecycle Comparison (L90 Baseline) - Adjusted Quantities: A: ' + formatNumber(adjustedBaselineQty, 1) + ' units | B: ' + formatNumber(adjustedProposedQty, 1) + ' units',
-                                color: '#333333',
+                                color: '#1A202C',
                                 font: { 
                                     size: window.innerWidth < 768 ? 12 : 16, 
-                                    weight: 'bold' 
+                                    weight: '700' 
                                 }
                             },
                             legend: {
                                 position: 'top',
                                 labels: { 
-                                    color: '#333333',
+                                    color: '#718096',
                                     padding: window.innerWidth < 768 ? 10 : 15,
-                                    font: { size: window.innerWidth < 768 ? 10 : 12 },
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 12,
+                                        weight: '500'
+                                    },
                                     boxWidth: window.innerWidth < 768 ? 15 : 40
                                 }
                             },
                             tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                                titleColor: '#1A202C',
+                                bodyColor: '#718096',
+                                borderColor: '#E2E8F0',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 15,
+                                titleFont: { weight: '600', size: 14 },
+                                bodyFont: { size: 12 },
                                 mode: 'index',
                                 intersect: false,
                                 callbacks: {
+                                    title: function(tooltipItems) {
+                                        if (tooltipItems.length > 0) {
+                                            var title = tooltipItems[0].label;
+                                            return title + ' - Detailed Breakdown';
+                                        }
+                                        return '';
+                                    },
                                     label: function(context) {
                                         var label = context.dataset.label || '';
                                         var value = context.parsed.y || 0;
@@ -1698,11 +2779,45 @@
                                         var percentage = ((value / total) * 100).toFixed(1);
                                         return label + ': ' + formatNumber(value) + ' kgCO2e (' + percentage + '%)';
                                     },
+                                    afterLabel: function(context) {
+                                        var index = context.dataIndex;
+                                        var scenarioKey = index < 2 ? 'without' : 'with';
+                                        var lifetimeKey = index % 2 === 0 ? 'L90' : 'L70';
+                                        var type = index < 2 ? 'baseline' : 'proposed';
+                                        
+                                        // Add detailed information based on the chart component
+                                        if (context.dataset.label === 'Manufacturing (A)') {
+                                            return [
+                                                '• Luminaire manufacturing impact',
+                                                '• Includes material extraction',
+                                                '• Transport to site',
+                                                '• Quantity: ' + quantities[index] + ' fixtures'
+                                            ];
+                                        } else if (context.dataset.label === 'Operations (B)') {
+                                            return [
+                                                '• Annual operational emissions',
+                                                '• Grid decarbonization included',
+                                                '• Control systems factored',
+                                                '• Replacements: ' + replacements[index] + ' times'
+                                            ];
+                                        } else if (context.dataset.label === 'End of Life (C)') {
+                                            return [
+                                                '• Disposal and recycling',
+                                                '• Material recovery credits',
+                                                '• Transport to facility'
+                                            ];
+                                        }
+                                        return [];
+                                    },
                                     footer: function(tooltipItems) {
                                         if (tooltipItems.length > 0) {
                                             var index = tooltipItems[0].dataIndex;
                                             var total = totals[index] || 0;
-                                            return 'Total: ' + formatNumber(total) + ' kgCO2e';
+                                            return [
+                                                '─────────────────────',
+                                                'Total GWP: ' + formatNumber(total) + ' kgCO2e',
+                                                '(Click to view detailed breakdown)'
+                                            ];
                                         }
                                         return '';
                                     }
@@ -1713,31 +2828,58 @@
                             x: {
                                 stacked: true,
                                 ticks: { 
-                                    color: '#666666',
-                                    font: { size: window.innerWidth < 768 ? 9 : 10 },
+                                    color: '#718096',
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 9 : 10,
+                                        weight: '500'
+                                    },
                                     maxRotation: window.innerWidth < 768 ? 90 : 45,
                                     minRotation: window.innerWidth < 768 ? 90 : 45
                                 },
-                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                                grid: { 
+                                    color: '#F0F4F8',
+                                    borderColor: '#E2E8F0'
+                                }
                             },
                             y: {
                                 stacked: true,
                                 beginAtZero: true,
                                 ticks: { 
-                                    color: '#666666',
+                                    color: '#718096',
                                     callback: function(value) {
                                         return formatNumber(value);
                                     },
-                                    font: { size: window.innerWidth < 768 ? 10 : 11 }
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 11,
+                                        weight: '500'
+                                    }
                                 },
-                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                grid: { 
+                                    color: '#F0F4F8',
+                                    borderColor: '#E2E8F0'
+                                },
                                 title: {
                                     display: true,
                                     text: 'GWP (kgCO2e)',
-                                    color: '#666666',
-                                    font: { size: window.innerWidth < 768 ? 10 : 12 }
+                                    color: '#718096',
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 12,
+                                        weight: '600'
+                                    }
                                 }
                             }
+                        }
+                    },
+                    onClick: function(event, elements) {
+                        if (elements.length > 0) {
+                            var element = elements[0];
+                            var datasetIndex = element.datasetIndex;
+                            var index = element.index;
+                            var datasetLabel = this.data.datasets[datasetIndex].label;
+                            var categoryLabel = this.data.labels[index];
+                            
+                            // Show detailed breakdown modal
+                            showDetailedBreakdown(datasetLabel, categoryLabel, index, datasetIndex);
                         }
                     }
                 });
@@ -1817,23 +2959,26 @@
                             {
                                 label: 'Initial Investment',
                                 data: initialCostData,
-                                backgroundColor: 'rgba(255, 99, 132, 0.8)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#E07B68',
+                                borderColor: '#D66855',
+                                borderWidth: 0,
+                                borderRadius: 4
                             },
                             {
                                 label: 'Replacement Costs',
                                 data: replacementCostData,
-                                backgroundColor: 'rgba(255, 206, 86, 0.8)',
-                                borderColor: 'rgba(255, 206, 86, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#FFCE56',
+                                borderColor: '#FFBB33',
+                                borderWidth: 0,
+                                borderRadius: 4
                             },
                             {
                                 label: 'Operational Costs',
                                 data: operationalCostData,
-                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
+                                backgroundColor: '#5B9BD5',
+                                borderColor: '#4A8BC4',
+                                borderWidth: 0,
+                                borderRadius: 4
                             }
                         ]
                     },
@@ -1844,22 +2989,33 @@
                             title: {
                                 display: true,
                                 text: 'Total Cost Comparison (' + inputs.projectLife + '-Year Project Life) - L90 Baseline',
-                                color: '#333333',
+                                color: '#1A202C',
                                 font: { 
                                     size: window.innerWidth < 768 ? 12 : 16, 
-                                    weight: 'bold' 
+                                    weight: '700' 
                                 }
                             },
                             legend: {
                                 position: 'top',
                                 labels: { 
-                                    color: '#333333',
+                                    color: '#718096',
                                     padding: window.innerWidth < 768 ? 10 : 15,
-                                    font: { size: window.innerWidth < 768 ? 10 : 12 },
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 12,
+                                        weight: '500'
+                                    },
                                     boxWidth: window.innerWidth < 768 ? 15 : 40
                                 }
                             },
                             tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1A202C',
+                                bodyColor: '#718096',
+                                borderColor: '#E2E8F0',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 12,
+                                titleFont: { weight: '600' },
                                 mode: 'index',
                                 intersect: false,
                                 callbacks: {
@@ -1885,29 +3041,44 @@
                             x: {
                                 stacked: true,
                                 ticks: { 
-                                    color: '#666666',
-                                    font: { size: window.innerWidth < 768 ? 9 : 10 },
+                                    color: '#718096',
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 9 : 10,
+                                        weight: '500'
+                                    },
                                     maxRotation: window.innerWidth < 768 ? 90 : 45,
                                     minRotation: window.innerWidth < 768 ? 90 : 45
                                 },
-                                grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                                grid: { 
+                                    color: '#F0F4F8',
+                                    borderColor: '#E2E8F0'
+                                }
                             },
                             y: {
                                 stacked: true,
                                 beginAtZero: true,
                                 ticks: { 
-                                    color: '#666666',
+                                    color: '#718096',
                                     callback: function(value) {
                                         return '$' + formatNumber(value);
                                     },
-                                    font: { size: window.innerWidth < 768 ? 10 : 11 }
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 11,
+                                        weight: '500'
+                                    }
                                 },
-                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                grid: { 
+                                    color: '#F0F4F8',
+                                    borderColor: '#E2E8F0'
+                                },
                                 title: {
                                     display: true,
                                     text: 'Total Cost ($)',
-                                    color: '#666666',
-                                    font: { size: window.innerWidth < 768 ? 10 : 12 }
+                                    color: '#718096',
+                                    font: { 
+                                        size: window.innerWidth < 768 ? 10 : 12,
+                                        weight: '600'
+                                    }
                                 }
                             }
                         }
@@ -1918,6 +3089,693 @@
             }
         }
         
+        // PHASE 3: Advanced Chart Drill-down Functionality
+        function showDetailedBreakdown(datasetLabel, categoryLabel, index, datasetIndex) {
+            try {
+                var modalHTML = `
+                    <div id="breakdownModal" class="settings-overlay" style="
+                        position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                        background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+                        align-items: center; justify-content: center; padding: 20px;
+                    ">
+                        <div class="breakdown-content" style="
+                            background: white; border-radius: 12px; padding: 30px; 
+                            max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;
+                            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                        ">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                                <h2 style="margin: 0; font-size: 24px; color: #1A202C;">Detailed Breakdown</h2>
+                                <button onclick="closeBreakdownModal()" style="
+                                    background: none; border: none; font-size: 24px; cursor: pointer; 
+                                    color: #718096; padding: 0; line-height: 1;
+                                ">&times;</button>
+                            </div>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="color: #2D3748; margin-bottom: 10px;">${datasetLabel} - ${categoryLabel}</h3>
+                                <div id="breakdownDetails"></div>
+                            </div>
+                            
+                            <div style="border-top: 1px solid #E2E8F0; padding-top: 20px; display: flex; justify-content: flex-end;">
+                                <button onclick="closeBreakdownModal()" style="
+                                    background: var(--color-primary); color: white; border: none; 
+                                    padding: 12px 24px; border-radius: 6px; cursor: pointer; 
+                                    font-weight: 600; font-size: 16px;
+                                ">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Populate breakdown details
+                var detailsContainer = document.getElementById('breakdownDetails');
+                var inputs = getCurrentInputs();
+                
+                var detailsHTML = '';
+                
+                if (datasetLabel === 'Manufacturing (A)') {
+                    detailsHTML = `
+                        <div style="background: #F7FAFC; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2D3748;">Manufacturing Impact Components</h4>
+                            <ul style="margin: 0; padding-left: 20px; color: #4A5568;">
+                                <li>Raw material extraction and processing</li>
+                                <li>LED chip manufacturing and packaging</li>
+                                <li>Housing and component assembly</li>
+                                <li>Quality testing and certification</li>
+                                <li>Packaging and shipping materials</li>
+                            </ul>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="background: #EDF2F7; padding: 15px; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #2D3748;">GWP per Unit</div>
+                                <div style="font-size: 18px; color: #4A5568;">${index < 2 ? inputs.baseline.gwp : inputs.proposed.gwp} kg CO2e</div>
+                            </div>
+                            <div style="background: #EDF2F7; padding: 15px; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #2D3748;">Total Quantity</div>
+                                <div style="font-size: 18px; color: #4A5568;">${Math.round(quantities[index])} fixtures</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (datasetLabel === 'Operations (B)') {
+                    detailsHTML = `
+                        <div style="background: #F0FFF4; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2D3748;">Operational Emissions Over Project Life</h4>
+                            <ul style="margin: 0; padding-left: 20px; color: #4A5568;">
+                                <li>Annual electricity consumption</li>
+                                <li>Grid carbon factor (with decarbonization)</li>
+                                <li>Control system efficiency impacts</li>
+                                <li>Maintenance and replacement cycles</li>
+                            </ul>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="background: #E6FFFA; padding: 15px; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #2D3748;">Annual Energy</div>
+                                <div style="font-size: 18px; color: #4A5568;">${formatNumber((index < 2 ? inputs.baseline.wattage : inputs.proposed.wattage) * (index < 2 ? inputs.baseline.qty : inputs.proposed.qty) * inputs.operationalHours / 1000)} kWh</div>
+                            </div>
+                            <div style="background: #E6FFFA; padding: 15px; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #2D3748;">Replacements</div>
+                                <div style="font-size: 18px; color: #4A5568;">${replacements[index]} times</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (datasetLabel === 'End of Life (C)') {
+                    detailsHTML = `
+                        <div style="background: #FFFAF0; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2D3748;">End-of-Life Treatment</h4>
+                            <ul style="margin: 0; padding-left: 20px; color: #4A5568;">
+                                <li>Collection and transport to facility</li>
+                                <li>Disassembly and material separation</li>
+                                <li>Metal recovery and recycling credits</li>
+                                <li>Hazardous material safe disposal</li>
+                                <li>Landfill disposal of non-recyclables</li>
+                            </ul>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="background: #FFF5E6; padding: 15px; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #2D3748;">EOL Impact per Unit</div>
+                                <div style="font-size: 18px; color: #4A5568;">${index < 2 ? inputs.baseline.eol : inputs.proposed.eol} kg CO2e</div>
+                            </div>
+                            <div style="background: #FFF5E6; padding: 15px; border-radius: 8px;">
+                                <div style="font-weight: 600; color: #2D3748;">Recovery Rate</div>
+                                <div style="font-size: 18px; color: #4A5568;">~75% metals</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                detailsContainer.innerHTML = detailsHTML;
+                
+            } catch (error) {
+                console.error('Error showing detailed breakdown:', error);
+            }
+        }
+        
+        function closeBreakdownModal() {
+            var modal = document.getElementById('breakdownModal');
+            if (modal) modal.remove();
+        }
+        
+        // PHASE 3: Advanced Interactive Visualizations
+        var timelineChartInstance = null;
+        var sensitivityChartInstance = null;
+        
+        // Enhanced timeline chart showing decarbonization impact over years
+        function createTimelineChart(scenarioData, inputs) {
+            try {
+                var canvas = document.getElementById('timelineChart');
+                if (!canvas) {
+                    // Create timeline chart container if it doesn't exist
+                    var chartsContainer = document.querySelector('.charts-container');
+                    if (chartsContainer) {
+                        var timelineContainer = document.createElement('div');
+                        timelineContainer.className = 'chart-container';
+                        timelineContainer.innerHTML = `
+                            <canvas id="timelineChart" style="max-height: 400px;"></canvas>
+                        `;
+                        chartsContainer.appendChild(timelineContainer);
+                        canvas = document.getElementById('timelineChart');
+                    }
+                }
+                
+                if (!canvas) return;
+                
+                if (timelineChartInstance) {
+                    timelineChartInstance.destroy();
+                }
+                
+                var ctx = canvas.getContext('2d');
+                
+                // Calculate yearly data with grid decarbonization
+                var years = [];
+                var baselineEmissions = [];
+                var proposedEmissions = [];
+                var gridFactors = [];
+                
+                for (var year = 0; year < inputs.projectLife; year++) {
+                    years.push((new Date().getFullYear() + year).toString());
+                    var gridFactorForYear = inputs.gridFactor * Math.pow(1 - (inputs.decarbonizationRate || 0.03), year);
+                    gridFactors.push(gridFactorForYear);
+                    
+                    var baselineAnnual = (inputs.baseline.wattage * inputs.baseline.qty * inputs.operationalHours / 1000) * gridFactorForYear;
+                    var proposedAnnual = (inputs.proposed.wattage * inputs.proposed.qty * inputs.operationalHours / 1000) * gridFactorForYear;
+                    
+                    baselineEmissions.push(baselineAnnual);
+                    proposedEmissions.push(proposedAnnual);
+                }
+                
+                timelineChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: years,
+                        datasets: [
+                            {
+                                label: 'Baseline Annual Emissions',
+                                data: baselineEmissions,
+                                borderColor: '#EF4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                fill: false,
+                                tension: 0.1,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            },
+                            {
+                                label: 'Proposed Annual Emissions',
+                                data: proposedEmissions,
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: false,
+                                tension: 0.1,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            },
+                            {
+                                label: 'Grid Carbon Factor',
+                                data: gridFactors,
+                                borderColor: '#6B7280',
+                                backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                                fill: false,
+                                tension: 0.1,
+                                pointRadius: 3,
+                                pointHoverRadius: 5,
+                                yAxisID: 'y1',
+                                borderDash: [5, 5]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Emissions Timeline with Grid Decarbonization',
+                                color: '#1A202C',
+                                font: { 
+                                    size: window.innerWidth < 768 ? 14 : 18, 
+                                    weight: '600' 
+                                }
+                            },
+                            legend: {
+                                position: 'top',
+                                labels: { 
+                                    color: '#718096',
+                                    font: { size: window.innerWidth < 768 ? 10 : 12 }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1A202C',
+                                bodyColor: '#718096',
+                                borderColor: '#E2E8F0',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.datasetIndex === 2) {
+                                            return context.dataset.label + ': ' + context.parsed.y.toFixed(3) + ' kg CO2e/kWh';
+                                        }
+                                        return context.dataset.label + ': ' + formatNumber(context.parsed.y) + ' kg CO2e';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Year',
+                                    color: '#718096'
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Annual Emissions (kg CO2e)',
+                                    color: '#718096'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Grid Factor (kg CO2e/kWh)',
+                                    color: '#718096'
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error creating timeline chart:', error);
+            }
+        }
+        
+        // Sensitivity analysis chart
+        function createSensitivityChart(inputs) {
+            try {
+                var canvas = document.getElementById('sensitivityChart');
+                if (!canvas) {
+                    var chartsContainer = document.querySelector('.charts-container');
+                    if (chartsContainer) {
+                        var sensitivityContainer = document.createElement('div');
+                        sensitivityContainer.className = 'chart-container';
+                        sensitivityContainer.innerHTML = `
+                            <div style="margin-bottom: 20px;">
+                                <h3 style="color: #1A202C; font-size: 18px; margin: 0 0 10px 0;">Sensitivity Analysis</h3>
+                                <p style="color: #718096; font-size: 14px; margin: 0;">Impact of parameter changes on GWP reduction</p>
+                            </div>
+                            <canvas id="sensitivityChart" style="max-height: 300px;"></canvas>
+                        `;
+                        chartsContainer.appendChild(sensitivityContainer);
+                        canvas = document.getElementById('sensitivityChart');
+                    }
+                }
+                
+                if (!canvas) return;
+                
+                if (sensitivityChartInstance) {
+                    sensitivityChartInstance.destroy();
+                }
+                
+                var ctx = canvas.getContext('2d');
+                
+                // Base case calculation
+                var baselineResult = calculateLuminaire(inputs, inputs.baseline, 'without', 'L90');
+                var proposedResult = calculateLuminaire(inputs, inputs.proposed, 'without', 'L90');
+                var baseGWPReduction = ((baselineResult.totalGWP - proposedResult.totalGWP) / baselineResult.totalGWP * 100);
+                
+                // Sensitivity analysis parameters
+                var parameters = [
+                    { name: 'Grid Factor +20%', factor: 'gridFactor', change: 1.2 },
+                    { name: 'Grid Factor -20%', factor: 'gridFactor', change: 0.8 },
+                    { name: 'Decarbonization +2%', factor: 'decarbonizationRate', change: 0.05 },
+                    { name: 'Decarbonization -2%', factor: 'decarbonizationRate', change: 0.01 },
+                    { name: 'Wattage +10%', factor: 'wattage', change: 1.1 },
+                    { name: 'Wattage -10%', factor: 'wattage', change: 0.9 }
+                ];
+                
+                var labels = [];
+                var impacts = [];
+                var colors = [];
+                
+                parameters.forEach(function(param) {
+                    var modifiedInputs = JSON.parse(JSON.stringify(inputs));
+                    
+                    if (param.factor === 'gridFactor' || param.factor === 'decarbonizationRate') {
+                        modifiedInputs[param.factor] = inputs[param.factor] * param.change;
+                    } else if (param.factor === 'wattage') {
+                        modifiedInputs.baseline.wattage = inputs.baseline.wattage * param.change;
+                        modifiedInputs.proposed.wattage = inputs.proposed.wattage * param.change;
+                    }
+                    
+                    var modBaselineResult = calculateLuminaire(modifiedInputs, modifiedInputs.baseline, 'without', 'L90');
+                    var modProposedResult = calculateLuminaire(modifiedInputs, modifiedInputs.proposed, 'without', 'L90');
+                    var modGWPReduction = ((modBaselineResult.totalGWP - modProposedResult.totalGWP) / modBaselineResult.totalGWP * 100);
+                    
+                    var impact = modGWPReduction - baseGWPReduction;
+                    
+                    labels.push(param.name);
+                    impacts.push(impact);
+                    colors.push(impact >= 0 ? '#10B981' : '#EF4444');
+                });
+                
+                sensitivityChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Impact on GWP Reduction (%)',
+                            data: impacts,
+                            backgroundColor: colors,
+                            borderColor: colors,
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                titleColor: '#1A202C',
+                                bodyColor: '#718096',
+                                borderColor: '#E2E8F0',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        var value = context.parsed.x;
+                                        return (value >= 0 ? '+' : '') + value.toFixed(1) + '% change in GWP reduction';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Change in GWP Reduction (%)',
+                                    color: '#718096'
+                                },
+                                grid: {
+                                    color: '#E2E8F0'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: '#E2E8F0'
+                                }
+                            }
+                        }
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error creating sensitivity chart:', error);
+            }
+        }
+        
+        // PHASE 3: User Preferences and Settings Persistence
+        var userPreferences = {
+            defaultInputs: {},
+            favoritePresets: [],
+            chartPreferences: {
+                showTimeline: true,
+                showSensitivity: true,
+                autoUpdateCharts: true
+            },
+            units: 'metric', // metric or imperial
+            theme: 'light' // light or dark
+        };
+        
+        // Load user preferences from localStorage
+        function loadUserPreferences() {
+            try {
+                var stored = localStorage.getItem('luminaireToolPreferences');
+                if (stored) {
+                    userPreferences = Object.assign(userPreferences, JSON.parse(stored));
+                    applyUserPreferences();
+                }
+            } catch (error) {
+                console.error('Error loading user preferences:', error);
+            }
+        }
+        
+        // Save user preferences to localStorage
+        function saveUserPreferences() {
+            try {
+                localStorage.setItem('luminaireToolPreferences', JSON.stringify(userPreferences));
+                showNotification('Settings saved successfully', 'success');
+            } catch (error) {
+                console.error('Error saving user preferences:', error);
+                showNotification('Failed to save settings', 'error');
+            }
+        }
+        
+        // Apply user preferences to the interface
+        function applyUserPreferences() {
+            try {
+                // Apply default inputs if they exist
+                if (userPreferences.defaultInputs && Object.keys(userPreferences.defaultInputs).length > 0) {
+                    Object.keys(userPreferences.defaultInputs).forEach(function(key) {
+                        var element = document.getElementById(key);
+                        if (element && userPreferences.defaultInputs[key] !== null) {
+                            element.value = userPreferences.defaultInputs[key];
+                        }
+                    });
+                }
+                
+                // Apply chart preferences
+                var timelineContainer = document.querySelector('#timelineChart')?.closest('.chart-container');
+                var sensitivityContainer = document.querySelector('#sensitivityChart')?.closest('.chart-container');
+                
+                if (timelineContainer) {
+                    timelineContainer.style.display = userPreferences.chartPreferences.showTimeline ? 'block' : 'none';
+                }
+                if (sensitivityContainer) {
+                    sensitivityContainer.style.display = userPreferences.chartPreferences.showSensitivity ? 'block' : 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error applying user preferences:', error);
+            }
+        }
+        
+        // Create settings panel
+        function createSettingsPanel() {
+            try {
+                var existingPanel = document.getElementById('settingsPanel');
+                if (existingPanel) {
+                    existingPanel.remove();
+                }
+                
+                var settingsHTML = `
+                    <div id="settingsPanel" class="settings-overlay" style="
+                        position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                        background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+                        align-items: center; justify-content: center; padding: 20px;
+                    ">
+                        <div class="settings-content" style="
+                            background: white; border-radius: 12px; padding: 30px; 
+                            max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+                            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                        ">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                                <h2 style="margin: 0; font-size: 24px; color: #1A202C;">Settings & Preferences</h2>
+                                <button onclick="closeSettingsPanel()" style="
+                                    background: none; border: none; font-size: 24px; cursor: pointer; 
+                                    color: #718096; padding: 0; line-height: 1;
+                                ">&times;</button>
+                            </div>
+                            
+                            <div class="settings-section" style="margin-bottom: 25px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #2D3748;">Default Input Values</h3>
+                                <p style="margin: 0 0 15px 0; color: #718096; font-size: 14px;">
+                                    Save current input values as your defaults for future sessions
+                                </p>
+                                <button onclick="saveCurrentAsDefaults()" style="
+                                    background: var(--color-primary); color: white; border: none; 
+                                    padding: 10px 20px; border-radius: 6px; cursor: pointer; 
+                                    font-weight: 500; margin-right: 10px;
+                                ">Save Current Values</button>
+                                <button onclick="clearDefaults()" style="
+                                    background: #E2E8F0; color: #4A5568; border: none; 
+                                    padding: 10px 20px; border-radius: 6px; cursor: pointer; 
+                                    font-weight: 500;
+                                ">Clear Defaults</button>
+                            </div>
+                            
+                            <div class="settings-section" style="margin-bottom: 25px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #2D3748;">Chart Display</h3>
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="showTimelineChart" style="margin-right: 10px;" 
+                                               ${userPreferences.chartPreferences.showTimeline ? 'checked' : ''}>
+                                        <span>Show Timeline Chart (Grid Decarbonization)</span>
+                                    </label>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="showSensitivityChart" style="margin-right: 10px;" 
+                                               ${userPreferences.chartPreferences.showSensitivity ? 'checked' : ''}>
+                                        <span>Show Sensitivity Analysis Chart</span>
+                                    </label>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="autoUpdateCharts" style="margin-right: 10px;" 
+                                               ${userPreferences.chartPreferences.autoUpdateCharts ? 'checked' : ''}>
+                                        <span>Auto-update charts on input change</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-section" style="margin-bottom: 25px;">
+                                <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #2D3748;">Data Management</h3>
+                                <button onclick="exportUserData()" style="
+                                    background: var(--color-primary); color: white; border: none; 
+                                    padding: 10px 20px; border-radius: 6px; cursor: pointer; 
+                                    font-weight: 500; margin-right: 10px;
+                                ">Export All Data</button>
+                                <button onclick="clearAllData()" style="
+                                    background: #E53E3E; color: white; border: none; 
+                                    padding: 10px 20px; border-radius: 6px; cursor: pointer; 
+                                    font-weight: 500;
+                                ">Clear All Data</button>
+                            </div>
+                            
+                            <div style="border-top: 1px solid #E2E8F0; padding-top: 20px; display: flex; justify-content: flex-end;">
+                                <button onclick="saveUserPreferences(); closeSettingsPanel();" style="
+                                    background: var(--color-primary); color: white; border: none; 
+                                    padding: 12px 24px; border-radius: 6px; cursor: pointer; 
+                                    font-weight: 600; font-size: 16px;
+                                ">Save Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', settingsHTML);
+                
+                // Add event listeners for checkbox changes
+                document.getElementById('showTimelineChart').addEventListener('change', function() {
+                    userPreferences.chartPreferences.showTimeline = this.checked;
+                    applyUserPreferences();
+                });
+                
+                document.getElementById('showSensitivityChart').addEventListener('change', function() {
+                    userPreferences.chartPreferences.showSensitivity = this.checked;
+                    applyUserPreferences();
+                });
+                
+                document.getElementById('autoUpdateCharts').addEventListener('change', function() {
+                    userPreferences.chartPreferences.autoUpdateCharts = this.checked;
+                });
+                
+            } catch (error) {
+                console.error('Error creating settings panel:', error);
+            }
+        }
+        
+        function closeSettingsPanel() {
+            var panel = document.getElementById('settingsPanel');
+            if (panel) panel.remove();
+        }
+        
+        function saveCurrentAsDefaults() {
+            try {
+                var inputs = getCurrentInputs();
+                userPreferences.defaultInputs = {};
+                
+                // Save all input values
+                Object.keys(inputs).forEach(function(key) {
+                    if (typeof inputs[key] === 'object' && inputs[key] !== null) {
+                        Object.keys(inputs[key]).forEach(function(subKey) {
+                            userPreferences.defaultInputs[key + subKey.charAt(0).toUpperCase() + subKey.slice(1)] = inputs[key][subKey];
+                        });
+                    } else {
+                        userPreferences.defaultInputs[key] = inputs[key];
+                    }
+                });
+                
+                showNotification('Current values saved as defaults', 'success');
+            } catch (error) {
+                console.error('Error saving defaults:', error);
+                showNotification('Failed to save defaults', 'error');
+            }
+        }
+        
+        function clearDefaults() {
+            userPreferences.defaultInputs = {};
+            showNotification('Default values cleared', 'success');
+        }
+        
+        function exportUserData() {
+            try {
+                var data = {
+                    preferences: userPreferences,
+                    currentInputs: getCurrentInputs(),
+                    exportDate: new Date().toISOString()
+                };
+                
+                var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'luminaire-tool-data-' + new Date().toISOString().split('T')[0] + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Data exported successfully', 'success');
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                showNotification('Failed to export data', 'error');
+            }
+        }
+        
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+                localStorage.removeItem('luminaireToolPreferences');
+                userPreferences = {
+                    defaultInputs: {},
+                    favoritePresets: [],
+                    chartPreferences: {
+                        showTimeline: true,
+                        showSensitivity: true,
+                        autoUpdateCharts: true
+                    },
+                    units: 'metric',
+                    theme: 'light'
+                };
+                showNotification('All data cleared', 'success');
+            }
+        }
+
         // Handle window resize
         var resizeTimer;
         window.addEventListener('resize', function() {
@@ -1938,13 +3796,827 @@
                     financialChartInstance.destroy();
                     calculateAll();
                 }
+                if (timelineChartInstance) {
+                    timelineChartInstance.destroy();
+                    calculateAll();
+                }
+                if (sensitivityChartInstance) {
+                    sensitivityChartInstance.destroy();
+                    calculateAll();
+                }
             }, 250);
         });
         
+        // PHASE 3: Performance Optimization
+        var calculationTimeout = null;
+        
+        function debouncedCalculateAll() {
+            clearTimeout(calculationTimeout);
+            calculationTimeout = setTimeout(function() {
+                if (userPreferences.chartPreferences.autoUpdateCharts) {
+                    calculateAll();
+                } else {
+                    updateMetricCards();
+                }
+            }, 300);
+        }
+        
+        // Add input event listeners for metric updates with performance optimization
+        var inputs = document.querySelectorAll('input[type="number"]');
+        inputs.forEach(function(input) {
+            input.addEventListener('input', function() {
+                updateMetricCards();
+                debouncedCalculateAll();
+            });
+        });
+        
+        // Comparison Mode Functionality
+        var currentAnalysisMode = 'single';
+        
+        function switchAnalysisMode(mode) {
+            try {
+                currentAnalysisMode = mode;
+                
+                var singleBtn = document.getElementById('singleModeBtn');
+                var comparisonBtn = document.getElementById('comparisonModeBtn');
+                var modeDescription = document.getElementById('modeDescription');
+                
+                if (mode === 'single') {
+                    singleBtn.classList.add('active');
+                    comparisonBtn.classList.remove('active');
+                    modeDescription.innerHTML = '<strong>Single Analysis:</strong> Compare baseline vs proposed luminaire in current scenario';
+                    
+                    // Hide comparison sections if they exist
+                    var comparisonContainers = document.querySelectorAll('.comparison-container');
+                    comparisonContainers.forEach(function(container) {
+                        container.classList.remove('active');
+                    });
+                    
+                } else if (mode === 'comparison') {
+                    singleBtn.classList.remove('active');
+                    comparisonBtn.classList.add('active');
+                    modeDescription.innerHTML = '<strong>Compare Scenarios:</strong> Analyze different scenarios side-by-side (e.g., different control strategies, maintenance approaches)';
+                    
+                    // Show comparison interface
+                    createComparisonInterface();
+                }
+                
+                calculateAll();
+            } catch (error) {
+                console.error('Error switching analysis mode:', error);
+            }
+        }
+        
+        function createComparisonInterface() {
+            try {
+                // Create comparison scenarios section
+                var inputSection = document.getElementById('input');
+                var existingComparison = document.getElementById('comparisonScenarios');
+                
+                if (existingComparison) {
+                    existingComparison.classList.add('active');
+                    return;
+                }
+                
+                var comparisonHTML = `
+                    <div id="comparisonScenarios" class="comparison-container active">
+                        <div class="scenario-panel current">
+                            <div class="scenario-header">
+                                <div class="scenario-title" style="color: var(--color-metric-blue);">Current Scenario</div>
+                                <div class="scenario-subtitle">Your current analysis</div>
+                            </div>
+                            <div class="comparison-metrics" id="currentMetrics">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="scenario-panel alternative">
+                            <div class="scenario-header">
+                                <div class="scenario-title" style="color: var(--color-metric-green);">Alternative Scenario</div>
+                                <div class="scenario-subtitle">
+                                    <select id="alternativeSelector" onchange="loadAlternativeScenario(this.value)" style="
+                                        background: var(--color-bg-secondary); 
+                                        border: 1px solid var(--color-border); 
+                                        padding: var(--space-xs) var(--space-sm); 
+                                        border-radius: var(--radius-sm);
+                                        font-size: 0.875rem;
+                                    ">
+                                        <option value="">Select alternative...</option>
+                                        <option value="efficient">High Efficiency LED</option>
+                                        <option value="balanced">Balanced Performance</option>
+                                        <option value="budget">Budget Option</option>
+                                        <option value="retrofit">Retrofit Analysis</option>
+                                        <option value="withControl">With Control System</option>
+                                        <option value="withMaintenance">With Control + Maintenance</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="comparison-metrics" id="alternativeMetrics">
+                                <div style="text-align: center; color: var(--color-text-secondary); padding: var(--space-xl);">
+                                    Select an alternative scenario above to compare
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                inputSection.insertAdjacentHTML('beforeend', comparisonHTML);
+                updateComparisonDisplay();
+                
+            } catch (error) {
+                console.error('Error creating comparison interface:', error);
+            }
+        }
+        
+        // Load alternative scenario for comparison
+        var alternativeResults = null;
+        
+        function loadAlternativeScenario(type) {
+            try {
+                if (!type) {
+                    alternativeResults = null;
+                    updateComparisonDisplay();
+                    return;
+                }
+                
+                var inputs = getCurrentInputs();
+                var alternativeInputs = JSON.parse(JSON.stringify(inputs)); // Deep copy
+                
+                if (presetScenarios[type]) {
+                    // Load preset scenario
+                    var scenario = presetScenarios[type];
+                    alternativeInputs.baseline = scenario.baseline;
+                    alternativeInputs.proposed = scenario.proposed;
+                } else if (type === 'withControl') {
+                    // With control system
+                    alternativeInputs.controlCoeff = 0.75;
+                    alternativeInputs.controlCostCoeff = 1.15;
+                } else if (type === 'withMaintenance') {
+                    // With control + maintenance
+                    alternativeInputs.controlCoeff = 0.75;
+                    alternativeInputs.controlCostCoeff = 1.15;
+                }
+                
+                // Calculate alternative results
+                var scenarios = ['without', 'with', 'withMaintenance'];
+                var resultsL90 = {};
+                
+                var adjustedBaselineL90 = {
+                    ...alternativeInputs.baseline,
+                    qty: alternativeInputs.baseline.qty / alternativeInputs.l90Factor
+                };
+                
+                var adjustedProposedL90 = {
+                    ...alternativeInputs.proposed,
+                    qty: alternativeInputs.proposed.qty / alternativeInputs.l90Factor
+                };
+                
+                scenarios.forEach(function(scenario) {
+                    var scenarioType = type === 'withControl' ? 'with' : 
+                                     type === 'withMaintenance' ? 'withMaintenance' : 'without';
+                    
+                    resultsL90[scenario] = {
+                        baseline: calculateLuminaire(alternativeInputs, adjustedBaselineL90, scenarioType, 'L90'),
+                        proposed: calculateLuminaire(alternativeInputs, adjustedProposedL90, scenarioType, 'L90')
+                    };
+                });
+                
+                alternativeResults = resultsL90;
+                updateComparisonDisplay();
+                
+            } catch (error) {
+                console.error('Error loading alternative scenario:', error);
+            }
+        }
+        
+        // Get current inputs
+        function getCurrentInputs() {
+            return {
+                gridFactor: parseFloat(document.getElementById('gridFactor').value) || 0.39,
+                electricityRate: parseFloat(document.getElementById('electricityRate').value) || 0.26,
+                inflationRate: parseFloat(document.getElementById('inflationRate').value) || 0.03,
+                decarbonizationRate: parseFloat(document.getElementById('decarbonizationRate').value) || 0.03,
+                controlCoeff: parseFloat(document.getElementById('controlCoeff').value) || 0.75,
+                controlCostCoeff: parseFloat(document.getElementById('controlCostCoeff').value) || 1.15,
+                operationalHours: parseFloat(document.getElementById('operationalHours').value) || 4990,
+                projectLife: parseFloat(document.getElementById('projectLife').value) || 15,
+                l90Factor: parseFloat(document.getElementById('l90Factor').value) || 0.9,
+                l70Factor: parseFloat(document.getElementById('l70Factor').value) || 0.7,
+                baseline: {
+                    wattage: parseFloat(document.getElementById('baselineWattage').value) || 12,
+                    flux: parseFloat(document.getElementById('baselineFlux').value) || 1000,
+                    qty: parseFloat(document.getElementById('baselineQty').value) || 500,
+                    l90Lifetime: parseFloat(document.getElementById('baselineL90Lifetime').value) || 50000,
+                    l70Lifetime: parseFloat(document.getElementById('baselineL70Lifetime').value) || 120000,
+                    gwp: parseFloat(document.getElementById('baselineGWP').value) || 10,
+                    eol: parseFloat(document.getElementById('baselineEOL').value) || 0.5,
+                    cost: parseFloat(document.getElementById('baselineCost').value) || 260
+                },
+                proposed: {
+                    wattage: parseFloat(document.getElementById('proposedWattage').value) || 9,
+                    flux: parseFloat(document.getElementById('proposedFlux').value) || 1059,
+                    qty: parseFloat(document.getElementById('proposedQty').value) || 473,
+                    l90Lifetime: parseFloat(document.getElementById('proposedL90Lifetime').value) || 45000,
+                    l70Lifetime: parseFloat(document.getElementById('proposedL70Lifetime').value) || 100000,
+                    gwp: parseFloat(document.getElementById('proposedGWP').value) || 20,
+                    eol: parseFloat(document.getElementById('proposedEOL').value) || 1.5,
+                    cost: parseFloat(document.getElementById('proposedCost').value) || 220
+                }
+            };
+        }
+        
+        // Update comparison display
+        function updateComparisonDisplay() {
+            try {
+                var currentMetrics = document.getElementById('currentMetrics');
+                var alternativeMetrics = document.getElementById('alternativeMetrics');
+                
+                if (!currentMetrics || !alternativeMetrics) return;
+                
+                // Get current results (from the main calculation)
+                var inputs = getCurrentInputs();
+                var adjustedBaselineL90 = {
+                    ...inputs.baseline,
+                    qty: inputs.baseline.qty / inputs.l90Factor
+                };
+                var adjustedProposedL90 = {
+                    ...inputs.proposed,
+                    qty: inputs.proposed.qty / inputs.l90Factor
+                };
+                
+                var currentResult = {
+                    baseline: calculateLuminaire(inputs, adjustedBaselineL90, 'without', 'L90'),
+                    proposed: calculateLuminaire(inputs, adjustedProposedL90, 'without', 'L90')
+                };
+                
+                // Display current scenario metrics
+                currentMetrics.innerHTML = createMetricsDisplay(currentResult, 'Current');
+                
+                // Display alternative scenario metrics
+                if (alternativeResults) {
+                    alternativeMetrics.innerHTML = createMetricsDisplay(alternativeResults.without, 'Alternative');
+                } else {
+                    alternativeMetrics.innerHTML = `
+                        <div style="text-align: center; color: var(--color-text-secondary); padding: var(--space-xl);">
+                            Select an alternative scenario above to compare
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error updating comparison display:', error);
+            }
+        }
+        
+        // Create metrics display HTML
+        function createMetricsDisplay(results, label) {
+            var gwpReduction = ((results.baseline.totalGWP - results.proposed.totalGWP) / results.baseline.totalGWP * 100).toFixed(1);
+            var costSavings = ((results.baseline.totalCost - results.proposed.totalCost) / results.baseline.totalCost * 100).toFixed(1);
+            
+            return `
+                <div class="comparison-metric">
+                    <div class="metric-label">GWP Reduction</div>
+                    <div class="metric-value" style="color: var(--color-success);">${gwpReduction}%</div>
+                </div>
+                <div class="comparison-metric">
+                    <div class="metric-label">Total GWP</div>
+                    <div class="metric-value">${formatNumber(results.proposed.totalGWP)} kg CO2e</div>
+                </div>
+                <div class="comparison-metric">
+                    <div class="metric-label">Cost Savings</div>
+                    <div class="metric-value" style="color: var(--color-success);">${costSavings}%</div>
+                </div>
+                <div class="comparison-metric">
+                    <div class="metric-label">Total Cost</div>
+                    <div class="metric-value">$${formatNumber(results.proposed.totalCost)}</div>
+                </div>
+                <div class="comparison-metric">
+                    <div class="metric-label">Annual Energy</div>
+                    <div class="metric-value">${formatNumber(results.proposed.annualEnergy)} kWh</div>
+                </div>
+                <div class="comparison-metric">
+                    <div class="metric-label">Payback Period</div>
+                    <div class="metric-value">${calculatePayback(results).toFixed(1)} years</div>
+                </div>
+            `;
+        }
+        
+        // Simple payback calculation
+        function calculatePayback(results) {
+            var annualSavings = results.baseline.annualOperatingCost - results.proposed.annualOperatingCost;
+            var initialCostDiff = results.proposed.initialCost - results.baseline.initialCost;
+            return annualSavings > 0 ? Math.max(0, initialCostDiff / annualSavings) : 0;
+        }
+        
+        // Export functionality
+        function exportReport(format) {
+            try {
+                if (format === 'pdf') {
+                    exportToPDF();
+                } else if (format === 'csv') {
+                    exportToCSV();
+                } else if (format === 'json') {
+                    exportToJSON();
+                }
+            } catch (error) {
+                console.error('Error exporting report:', error);
+                showNotification('Export failed', 'error');
+            }
+        }
+        
+        function exportToPDF() {
+            // Create a print-friendly version
+            var printContent = generatePrintContent();
+            var printWindow = window.open('', '_blank');
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Luminaire Analysis Report</title>
+                    <style>
+                        body { font-family: 'Inter', Arial, sans-serif; margin: 0; padding: 20px; font-size: 12px; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                        .header h1 { margin: 0; font-size: 24px; color: #333; }
+                        .header p { margin: 5px 0; color: #666; }
+                        .section { margin-bottom: 25px; break-inside: avoid; }
+                        .section h2 { font-size: 16px; color: #333; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+                        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+                        .metric-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; }
+                        .metric-card .label { font-size: 11px; color: #666; margin-bottom: 5px; }
+                        .metric-card .value { font-size: 18px; font-weight: bold; color: #333; }
+                        .calc-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                        .calc-table th, .calc-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        .calc-table th { background: #f5f5f5; font-weight: bold; }
+                        .assumptions { font-size: 10px; color: #666; margin-top: 20px; }
+                        @media print {
+                            body { margin: 0; }
+                            .section { page-break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            setTimeout(function() {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+            
+            showNotification('Opening print dialog...', 'success');
+        }
+        
+        function generatePrintContent() {
+            var inputs = getCurrentInputs();
+            var adjustedBaselineL90 = {
+                ...inputs.baseline,
+                qty: inputs.baseline.qty / inputs.l90Factor
+            };
+            var adjustedProposedL90 = {
+                ...inputs.proposed,
+                qty: inputs.proposed.qty / inputs.l90Factor
+            };
+            
+            var results = {
+                baseline: calculateLuminaire(inputs, adjustedBaselineL90, 'without', 'L90'),
+                proposed: calculateLuminaire(inputs, adjustedProposedL90, 'without', 'L90')
+            };
+            
+            var gwpReduction = ((results.baseline.totalGWP - results.proposed.totalGWP) / results.baseline.totalGWP * 100).toFixed(1);
+            var costSavings = ((results.baseline.totalCost - results.proposed.totalCost) / results.baseline.totalCost * 100).toFixed(1);
+            var payback = calculatePayback(results).toFixed(1);
+            
+            return `
+                <div class="header">
+                    <h1>Luminaire GWP & Cost Assessment Report</h1>
+                    <p>Generated on ${new Date().toLocaleDateString()}</p>
+                    <p>Dimitrios Tsiokaras - dimitrios@electrolight.com</p>
+                </div>
+                
+                <div class="section">
+                    <h2>Executive Summary</h2>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="label">GWP Reduction</div>
+                            <div class="value" style="color: #48BB78;">${gwpReduction}%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="label">Cost Savings</div>
+                            <div class="value" style="color: #48BB78;">${costSavings}%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="label">Payback Period</div>
+                            <div class="value">${payback} years</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Luminaire Specifications</h2>
+                    <table class="calc-table">
+                        <tr><th>Parameter</th><th>Baseline (A)</th><th>Proposed (B)</th></tr>
+                        <tr><td>Wattage</td><td>${inputs.baseline.wattage}W</td><td>${inputs.proposed.wattage}W</td></tr>
+                        <tr><td>Luminous Flux</td><td>${inputs.baseline.flux} lm</td><td>${inputs.proposed.flux} lm</td></tr>
+                        <tr><td>Quantity</td><td>${inputs.baseline.qty}</td><td>${inputs.proposed.qty}</td></tr>
+                        <tr><td>L90 Lifetime</td><td>${formatNumber(inputs.baseline.l90Lifetime)} hrs</td><td>${formatNumber(inputs.proposed.l90Lifetime)} hrs</td></tr>
+                        <tr><td>Manufacturing GWP</td><td>${inputs.baseline.gwp} kg CO2e</td><td>${inputs.proposed.gwp} kg CO2e</td></tr>
+                        <tr><td>Cost per Fixture</td><td>$${inputs.baseline.cost}</td><td>$${inputs.proposed.cost}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="section">
+                    <h2>Environmental Impact Analysis</h2>
+                    <table class="calc-table">
+                        <tr><th>Component</th><th>Baseline (kg CO2e)</th><th>Proposed (kg CO2e)</th><th>Reduction</th></tr>
+                        <tr><td>Manufacturing</td><td>${formatNumber(results.baseline.embodiedGWP)}</td><td>${formatNumber(results.proposed.embodiedGWP)}</td><td>${formatNumber(results.baseline.embodiedGWP - results.proposed.embodiedGWP)}</td></tr>
+                        <tr><td>Operations (15 years)</td><td>${formatNumber(results.baseline.operationalGWP)}</td><td>${formatNumber(results.proposed.operationalGWP)}</td><td>${formatNumber(results.baseline.operationalGWP - results.proposed.operationalGWP)}</td></tr>
+                        <tr><td>End of Life</td><td>${formatNumber(results.baseline.eolGWP)}</td><td>${formatNumber(results.proposed.eolGWP)}</td><td>${formatNumber(results.baseline.eolGWP - results.proposed.eolGWP)}</td></tr>
+                        <tr style="font-weight: bold;"><td>Total</td><td>${formatNumber(results.baseline.totalGWP)}</td><td>${formatNumber(results.proposed.totalGWP)}</td><td>${formatNumber(results.baseline.totalGWP - results.proposed.totalGWP)}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="section">
+                    <h2>Financial Analysis</h2>
+                    <table class="calc-table">
+                        <tr><th>Component</th><th>Baseline ($)</th><th>Proposed ($)</th><th>Savings ($)</th></tr>
+                        <tr><td>Initial Cost</td><td>${formatNumber(results.baseline.initialCost)}</td><td>${formatNumber(results.proposed.initialCost)}</td><td>${formatNumber(results.baseline.initialCost - results.proposed.initialCost)}</td></tr>
+                        <tr><td>Replacement Cost</td><td>${formatNumber(results.baseline.replacementCost)}</td><td>${formatNumber(results.proposed.replacementCost)}</td><td>${formatNumber(results.baseline.replacementCost - results.proposed.replacementCost)}</td></tr>
+                        <tr><td>Operating Cost (15 years)</td><td>${formatNumber(results.baseline.totalOperatingCost)}</td><td>${formatNumber(results.proposed.totalOperatingCost)}</td><td>${formatNumber(results.baseline.totalOperatingCost - results.proposed.totalOperatingCost)}</td></tr>
+                        <tr style="font-weight: bold;"><td>Total</td><td>${formatNumber(results.baseline.totalCost)}</td><td>${formatNumber(results.proposed.totalCost)}</td><td>${formatNumber(results.baseline.totalCost - results.proposed.totalCost)}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="section">
+                    <h2>Key Assumptions</h2>
+                    <div class="assumptions">
+                        <p><strong>Project Parameters:</strong> ${inputs.projectLife} year analysis period, ${formatNumber(inputs.operationalHours)} annual operating hours</p>
+                        <p><strong>Financial:</strong> ${(inputs.electricityRate).toFixed(3)} $/kWh electricity rate, ${(inputs.inflationRate * 100).toFixed(1)}% annual inflation</p>
+                        <p><strong>Grid:</strong> ${inputs.gridFactor} kg CO2e/kWh grid factor, ${(inputs.decarbonizationRate * 100).toFixed(1)}% annual decarbonization rate</p>
+                        <p><strong>Maintenance:</strong> L90 factor ${inputs.l90Factor}, accounting for lumen maintenance over time</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function exportToCSV() {
+            var inputs = getCurrentInputs();
+            var adjustedBaselineL90 = {
+                ...inputs.baseline,
+                qty: inputs.baseline.qty / inputs.l90Factor
+            };
+            var adjustedProposedL90 = {
+                ...inputs.proposed,
+                qty: inputs.proposed.qty / inputs.l90Factor
+            };
+            
+            var results = {
+                baseline: calculateLuminaire(inputs, adjustedBaselineL90, 'without', 'L90'),
+                proposed: calculateLuminaire(inputs, adjustedProposedL90, 'without', 'L90')
+            };
+            
+            var csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Luminaire Analysis Results\\n";
+            csvContent += "Generated," + new Date().toISOString() + "\\n\\n";
+            
+            csvContent += "Parameter,Baseline,Proposed,Difference\\n";
+            csvContent += "Wattage (W)," + inputs.baseline.wattage + "," + inputs.proposed.wattage + "," + (inputs.baseline.wattage - inputs.proposed.wattage) + "\\n";
+            csvContent += "Annual Energy (kWh)," + results.baseline.annualEnergy + "," + results.proposed.annualEnergy + "," + (results.baseline.annualEnergy - results.proposed.annualEnergy) + "\\n";
+            csvContent += "Total GWP (kg CO2e)," + results.baseline.totalGWP + "," + results.proposed.totalGWP + "," + (results.baseline.totalGWP - results.proposed.totalGWP) + "\\n";
+            csvContent += "Total Cost ($)," + results.baseline.totalCost + "," + results.proposed.totalCost + "," + (results.baseline.totalCost - results.proposed.totalCost) + "\\n";
+            
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "luminaire_analysis_" + new Date().toISOString().split('T')[0] + ".csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('CSV exported successfully', 'success');
+        }
+        
+        function exportToJSON() {
+            var data = {
+                timestamp: new Date().toISOString(),
+                inputs: getCurrentInputs(),
+                results: (() => {
+                    var inputs = getCurrentInputs();
+                    var adjustedBaselineL90 = {
+                        ...inputs.baseline,
+                        qty: inputs.baseline.qty / inputs.l90Factor
+                    };
+                    var adjustedProposedL90 = {
+                        ...inputs.proposed,
+                        qty: inputs.proposed.qty / inputs.l90Factor
+                    };
+                    
+                    return {
+                        baseline: calculateLuminaire(inputs, adjustedBaselineL90, 'without', 'L90'),
+                        proposed: calculateLuminaire(inputs, adjustedProposedL90, 'without', 'L90')
+                    };
+                })()
+            };
+            
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+            var link = document.createElement("a");
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", "luminaire_analysis_" + new Date().toISOString().split('T')[0] + ".json");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('JSON exported successfully', 'success');
+        }
+        
+        // Preset Scenarios Data
+        var presetScenarios = {
+            efficient: {
+                name: "High Efficiency LED",
+                description: "Best-in-class LED with advanced controls",
+                icon: "⚡",
+                baseline: {
+                    wattage: 15,
+                    flux: 1200,
+                    qty: 500,
+                    l90Lifetime: 45000,
+                    l70Lifetime: 100000,
+                    gwp: 12,
+                    eol: 0.8,
+                    cost: 280
+                },
+                proposed: {
+                    wattage: 7,
+                    flux: 1200,
+                    qty: 500,
+                    l90Lifetime: 100000,
+                    l70Lifetime: 150000,
+                    gwp: 25,
+                    eol: 1.2,
+                    cost: 180
+                }
+            },
+            balanced: {
+                name: "Balanced Performance",
+                description: "Good efficiency with moderate cost",
+                icon: "⚖️",
+                baseline: {
+                    wattage: 12,
+                    flux: 1000,
+                    qty: 500,
+                    l90Lifetime: 50000,
+                    l70Lifetime: 120000,
+                    gwp: 10,
+                    eol: 0.5,
+                    cost: 260
+                },
+                proposed: {
+                    wattage: 9,
+                    flux: 1059,
+                    qty: 473,
+                    l90Lifetime: 45000,
+                    l70Lifetime: 100000,
+                    gwp: 20,
+                    eol: 1.5,
+                    cost: 220
+                }
+            },
+            budget: {
+                name: "Budget Option",
+                description: "Cost-effective with standard performance",
+                icon: "💰",
+                baseline: {
+                    wattage: 18,
+                    flux: 1400,
+                    qty: 500,
+                    l90Lifetime: 35000,
+                    l70Lifetime: 75000,
+                    gwp: 8,
+                    eol: 0.3,
+                    cost: 340
+                },
+                proposed: {
+                    wattage: 14,
+                    flux: 1400,
+                    qty: 500,
+                    l90Lifetime: 40000,
+                    l70Lifetime: 85000,
+                    gwp: 12,
+                    eol: 0.6,
+                    cost: 200
+                }
+            },
+            retrofit: {
+                name: "Retrofit Analysis",
+                description: "Fluorescent to LED conversion",
+                icon: "🔄",
+                baseline: {
+                    wattage: 32,
+                    flux: 2500,
+                    qty: 300,
+                    l90Lifetime: 12000,
+                    l70Lifetime: 20000,
+                    gwp: 5,
+                    eol: 0.2,
+                    cost: 85
+                },
+                proposed: {
+                    wattage: 18,
+                    flux: 2600,
+                    qty: 300,
+                    l90Lifetime: 50000,
+                    l70Lifetime: 100000,
+                    gwp: 15,
+                    eol: 0.8,
+                    cost: 140
+                }
+            }
+        };
+        
+        // Load preset scenario
+        function loadPresetScenario(scenarioKey) {
+            try {
+                var scenario = presetScenarios[scenarioKey];
+                if (!scenario) {
+                    console.error('Preset scenario not found:', scenarioKey);
+                    return;
+                }
+                
+                // Update baseline inputs
+                document.getElementById('baselineWattage').value = scenario.baseline.wattage;
+                document.getElementById('baselineFlux').value = scenario.baseline.flux;
+                document.getElementById('baselineQty').value = scenario.baseline.qty;
+                document.getElementById('baselineL90Lifetime').value = scenario.baseline.l90Lifetime;
+                document.getElementById('baselineL70Lifetime').value = scenario.baseline.l70Lifetime;
+                document.getElementById('baselineGWP').value = scenario.baseline.gwp;
+                document.getElementById('baselineEOL').value = scenario.baseline.eol;
+                document.getElementById('baselineCost').value = scenario.baseline.cost;
+                
+                // Update proposed inputs
+                document.getElementById('proposedWattage').value = scenario.proposed.wattage;
+                document.getElementById('proposedFlux').value = scenario.proposed.flux;
+                document.getElementById('proposedQty').value = scenario.proposed.qty;
+                document.getElementById('proposedL90Lifetime').value = scenario.proposed.l90Lifetime;
+                document.getElementById('proposedL70Lifetime').value = scenario.proposed.l70Lifetime;
+                document.getElementById('proposedGWP').value = scenario.proposed.gwp;
+                document.getElementById('proposedEOL').value = scenario.proposed.eol;
+                document.getElementById('proposedCost').value = scenario.proposed.cost;
+                
+                // Update efficacy calculations
+                window.updateEfficacy('baseline');
+                window.updateEfficacy('proposed');
+                
+                // Trigger recalculation
+                calculateAll();
+                
+                // Show success message
+                showNotification(`Loaded "${scenario.name}" scenario`, 'success');
+                
+            } catch (error) {
+                console.error('Error loading preset scenario:', error);
+                showNotification('Error loading scenario', 'error');
+            }
+        }
+        
+        // Simple notification system
+        function showNotification(message, type) {
+            var notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--color-success)' : 'var(--color-error)'};
+                color: white;
+                padding: var(--space-md) var(--space-lg);
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-lg);
+                z-index: 1000;
+                font-weight: 600;
+                transition: all var(--transition-base);
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(function() {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Update calculation breakdown display
+        function updateCalculationBreakdown(results, inputs) {
+            try {
+                if (!results || !results.without) return;
+                
+                var baselineResult = results.without.baseline;
+                var proposedResult = results.without.proposed;
+                
+                // Update GWP calculation details
+                var gwpDetails = document.getElementById('gwpCalcDetails');
+                if (gwpDetails) {
+                    gwpDetails.innerHTML = `
+                        <div class="calc-step">
+                            <span class="calc-step-label">Manufacturing (Baseline)</span>
+                            <span class="calc-step-value">${formatNumber(baselineResult.embodiedGWP)} kg CO2e</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Operations (Baseline)</span>
+                            <span class="calc-step-value">${formatNumber(baselineResult.operationalGWP)} kg CO2e</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">End of Life (Baseline)</span>
+                            <span class="calc-step-value">${formatNumber(baselineResult.eolGWP)} kg CO2e</span>
+                        </div>
+                        <div class="calc-step" style="border-top: 2px solid var(--color-metric-green); background: var(--color-bg-primary);">
+                            <span class="calc-step-label"><strong>Total Baseline GWP</strong></span>
+                            <span class="calc-step-value"><strong>${formatNumber(baselineResult.totalGWP)} kg CO2e</strong></span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Manufacturing (Proposed)</span>
+                            <span class="calc-step-value">${formatNumber(proposedResult.embodiedGWP)} kg CO2e</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Operations (Proposed)</span>
+                            <span class="calc-step-value">${formatNumber(proposedResult.operationalGWP)} kg CO2e</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">End of Life (Proposed)</span>
+                            <span class="calc-step-value">${formatNumber(proposedResult.eolGWP)} kg CO2e</span>
+                        </div>
+                        <div class="calc-step" style="border-top: 2px solid var(--color-metric-green); background: var(--color-bg-primary);">
+                            <span class="calc-step-label"><strong>Total Proposed GWP</strong></span>
+                            <span class="calc-step-value"><strong>${formatNumber(proposedResult.totalGWP)} kg CO2e</strong></span>
+                        </div>
+                        <div class="calc-step" style="border: 2px solid var(--color-success); background: var(--color-success); color: white;">
+                            <span class="calc-step-label"><strong>GWP Reduction</strong></span>
+                            <span class="calc-step-value"><strong>${((baselineResult.totalGWP - proposedResult.totalGWP) / baselineResult.totalGWP * 100).toFixed(1)}%</strong></span>
+                        </div>
+                    `;
+                }
+                
+                // Update cost calculation details
+                var costDetails = document.getElementById('costCalcDetails');
+                if (costDetails) {
+                    costDetails.innerHTML = `
+                        <div class="calc-step">
+                            <span class="calc-step-label">Initial Cost (Baseline)</span>
+                            <span class="calc-step-value">$${formatNumber(baselineResult.initialCost)}</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Replacement Cost (Baseline)</span>
+                            <span class="calc-step-value">$${formatNumber(baselineResult.replacementCost)}</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Operating Cost (Baseline)</span>
+                            <span class="calc-step-value">$${formatNumber(baselineResult.totalOperatingCost)}</span>
+                        </div>
+                        <div class="calc-step" style="border-top: 2px solid var(--color-metric-blue); background: var(--color-bg-primary);">
+                            <span class="calc-step-label"><strong>Total Baseline Cost</strong></span>
+                            <span class="calc-step-value"><strong>$${formatNumber(baselineResult.totalCost)}</strong></span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Initial Cost (Proposed)</span>
+                            <span class="calc-step-value">$${formatNumber(proposedResult.initialCost)}</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Replacement Cost (Proposed)</span>
+                            <span class="calc-step-value">$${formatNumber(proposedResult.replacementCost)}</span>
+                        </div>
+                        <div class="calc-step">
+                            <span class="calc-step-label">Operating Cost (Proposed)</span>
+                            <span class="calc-step-value">$${formatNumber(proposedResult.totalOperatingCost)}</span>
+                        </div>
+                        <div class="calc-step" style="border-top: 2px solid var(--color-metric-blue); background: var(--color-bg-primary);">
+                            <span class="calc-step-label"><strong>Total Proposed Cost</strong></span>
+                            <span class="calc-step-value"><strong>$${formatNumber(proposedResult.totalCost)}</strong></span>
+                        </div>
+                        <div class="calc-step" style="border: 2px solid var(--color-success); background: var(--color-success); color: white;">
+                            <span class="calc-step-label"><strong>Cost Savings</strong></span>
+                            <span class="calc-step-value"><strong>${((baselineResult.totalCost - proposedResult.totalCost) / baselineResult.totalCost * 100).toFixed(1)}%</strong></span>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error updating calculation breakdown:', error);
+            }
+        }
+        
         window.addEventListener('load', function() {
             try {
+                // Load user preferences first
+                loadUserPreferences();
+                
                 updateEfficacy('baseline');
                 updateEfficacy('proposed');
+                updateMetricCards();
                 calculateAll();
             } catch (error) {
                 console.error('Error on page load:', error);
